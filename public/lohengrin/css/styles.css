@@ -1,0 +1,19 @@
+body {
+	margin:0px;
+	font-family:verdana;
+	background-image:url(../images/bg.png);
+	background-repeat:repeat;
+}
+
+@-webkit-keyframes blink
+{
+	from { fill: transparent; }
+	to { fill: yellow; }
+}
+
+.blue_anime {
+	-webkit-animation: blink 1s linear 2s infinite alternate;
+}
+.red_anime {
+	-webkit-animation: blink 1s linear 2s infinite alternate;
+}

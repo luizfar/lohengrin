@@ -1,0 +1,7 @@
+*.swp
+*.*~
+node_modules/
+.DS_[s|S]tore
+public/css/*.css
+setup_env.sh
+.env
