@@ -1,3 +1,18 @@
+@-webkit-keyframes blink-failure {
+  from { -webkit-transform: scale(1.2,1.2); }
+  to { -webkit-transform: scale(1,1); }
+}
+
+@-webkit-keyframes rotate-names {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(359deg);  }
+}
+
+@-webkit-keyframes blink-building {
+  from { fill: orange; -webkit-transform: scale(1,1);}
+  to { fill: yellow; -webkit-transform: scale(1.5,1.5); }
+}
+
 .node {
   stroke-width: 1px;
 }
@@ -13,28 +28,15 @@
 .nodetext {
   fill: white;
   stroke: #999;
-  stroke-width: 0.2px;
   pointer-events: none;
   font: 16px sans-serif;
-  -webkit-transform: rotate(-45deg);
-  -moz-transform: rotate(-45deg);
-}
-
-@-webkit-keyframes blink-failure {
-  from { -webkit-transform: scale(2,2); }
-  to { -webkit-transform: scale(1,1); }
-}
-
-@-webkit-keyframes blink-building
-{
-  from { fill: orange; -webkit-transform: scale(1,1);}
-  to { fill: yellow; -webkit-transform: scale(1.5,1.5); }
+  -webkit-transform: rotate(40deg);
 }
 
 .building {
-  -webkit-animation: blink-building 1s linear 2s infinite alternate;
+  -webkit-animation: blink-building 1s linear 0s infinite alternate;
 }
 
 .failure {
-  -webkit-animation: blink-failure 1s linear 2s infinite alternate;
+  -webkit-animation: blink-failure 1s linear 0s infinite alternate;
 }
