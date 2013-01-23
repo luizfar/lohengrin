@@ -19,7 +19,8 @@ function init() {
     $.get('/config', function (config) {
       lg.settings = {
         rootJobName: config.rootJobName,
-        jobFilter: config.jobFilter
+        jobFilter: config.jobFilter,
+        lastJobName: config.lastJobName
       };
       callback();
     });
