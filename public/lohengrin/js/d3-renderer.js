@@ -105,6 +105,8 @@ lg.d3 = function () {
           return '';
         });
 
+    nodeEnter.append('title').text(function (d) { return d.displayName; });
+
     allNodes.exit().remove();
 
     force.on("tick", function() {
