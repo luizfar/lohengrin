@@ -1,19 +1,20 @@
 body {
-	margin:0px;
-	font-family:verdana;
-	background-image:url(../images/bg.png);
-	background-repeat:repeat;
+  margin:0px;
+  font-family:verdana;
+  background: black;
+  background: -webkit-radial-gradient(circle, #000, #333);
+  color: white;
 }
 
 @-webkit-keyframes blink
 {
-	from { fill: transparent; }
-	to { fill: yellow; }
+  from { fill: transparent; }
+  to { fill: yellow; }
 }
 
 .blue_anime {
-	-webkit-animation: blink 1s linear 2s infinite alternate;
+  -webkit-animation: blink 1s linear 2s infinite alternate;
 }
 .red_anime {
-	-webkit-animation: blink 1s linear 2s infinite alternate;
+  -webkit-animation: blink 1s linear 2s infinite alternate;
 }

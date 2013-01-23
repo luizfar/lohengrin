@@ -6,12 +6,11 @@
   stroke: green;
 }
 .link {
-  stroke: #000;
+  stroke: #eee;
   stroke-opacity: .8;
 }
 .nodetext {
-  stroke: black;
-  stroke-width: 0.1px;
+  fill: white;
   pointer-events: none;
   font: 16px sans-serif;
   -webkit-transform: rotate(-45deg);
@@ -25,14 +24,14 @@
 
 @-webkit-keyframes blink-building
 {
-	from { fill: orange; -webkit-transform: scale(1,1);}
-	to { fill: yellow; -webkit-transform: scale(1.5,1.5); }
+  from { fill: orange; -webkit-transform: scale(1,1);}
+  to { fill: yellow; -webkit-transform: scale(1.5,1.5); }
 }
 
 .building {
-	-webkit-animation: blink-building 1s linear 2s infinite alternate;
+  -webkit-animation: blink-building 1s linear 2s infinite alternate;
 }
 
 .failure {
-	-webkit-animation: blink-failure 1s linear 2s infinite alternate;
+  -webkit-animation: blink-failure 1s linear 2s infinite alternate;
 }
