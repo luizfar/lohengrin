@@ -7,10 +7,13 @@
 }
 .link {
   stroke: #eee;
-  stroke-opacity: .8;
+  stroke-width: 5px;
+  stroke-opacity: .3;
 }
 .nodetext {
   fill: white;
+  stroke: #999;
+  stroke-width: 0.2px;
   pointer-events: none;
   font: 16px sans-serif;
   -webkit-transform: rotate(-45deg);
