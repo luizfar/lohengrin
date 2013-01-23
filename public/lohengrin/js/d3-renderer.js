@@ -3,8 +3,8 @@ var lg = lg || {};
 lg.d3 = function () {
   var self = {};
 
-  var width = 1250,
-      height = 600;
+  var width = window.innerWidth,
+      height = window.innerHeight;
 
   var color = d3.scale.category20();
 
