@@ -30,7 +30,7 @@
   stroke: #999;
   pointer-events: none;
   font: 16px sans-serif;
-  -webkit-transform: rotate(40deg);
+  -webkit-transform: rotate(-40deg);
 }
 
 .building {
