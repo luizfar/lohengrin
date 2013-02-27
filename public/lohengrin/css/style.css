@@ -1,6 +1,7 @@
 body {
   padding: 0px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px "Lucida Grande", sans-serif;
+  overflow: hidden;
 }
 a {
   color: #00B7FF;
