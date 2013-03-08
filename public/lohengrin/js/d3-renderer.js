@@ -4,7 +4,8 @@ lg.d3 = function () {
   var self = {};
 
   var width = window.innerWidth,
-      height = window.innerHeight;
+      height = window.innerHeight,
+      nodeRadius = 10;
 
   var color = d3.scale.category20();
 
@@ -67,10 +68,10 @@ lg.d3 = function () {
 
     nodeEnter.append('svg:circle')
         .attr('r', function (d) {
-          return 10;
+          return nodeRadius;
         })
-        .attr('class', function (d) { 
-          return d.status + ' ' + (d.job.isLast ? 'last' : ''); 
+        .attr('class', function (d) {
+          return d.status + ' ' + (d.job.isLast ? 'last' : '');
         })
         .style('fill', function(d) {
           if (d.status == 'success') {
@@ -111,18 +112,25 @@ lg.d3 = function () {
 
     force.on("tick", function() {
       linkEnter
-          .attr("x1", function(d) { return d.source.x; })
-          .attr("y1", function(d) { return d.source.y; })
-          .attr("x2", function(d) { return d.target.x; })
-          .attr("y2", function(d) { return d.target.y; });
+        .attr("x1", function(d) { return normalizePosition(d.source).x; })
+        .attr("y1", function(d) { return normalizePosition(d.source).y; })
+        .attr("x2", function(d) { return normalizePosition(d.target).x; })
+        .attr("y2", function(d) { return normalizePosition(d.target).y; });
 
       nodeEnter.attr("transform", function(d) {
-            return "translate(" + d.x + "," + d.y + ")";
-          });
+        var position = normalizePosition(d);
+        return "translate(" + position.x + "," + position.y + ")";
+      });
     });
 
-
     force.start();
+  }
+
+  function normalizePosition(d) {
+    return {
+      x: Math.max(nodeRadius, Math.min(width - nodeRadius, d.x)),
+      y: Math.max(nodeRadius, Math.min(height - nodeRadius, d.y))
+    };
   }
 
   self.redraw = function () {
