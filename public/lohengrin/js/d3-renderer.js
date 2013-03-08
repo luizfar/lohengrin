@@ -127,9 +127,10 @@ lg.d3 = function () {
   }
 
   function normalizePosition(d) {
+    var averageTextSize = 100;
     return {
-      x: Math.max(nodeRadius, Math.min(width - nodeRadius, d.x)),
-      y: Math.max(nodeRadius, Math.min(height - nodeRadius, d.y))
+      x: Math.max(nodeRadius, Math.min(width - nodeRadius - averageTextSize, d.x)),
+      y: Math.max(nodeRadius + averageTextSize, Math.min(height - nodeRadius, d.y))
     };
   }
 
