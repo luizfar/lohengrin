@@ -3,7 +3,7 @@ var lg = lg || {};
 lg.d3 = function () {
   var self = {};
 
-  var width = window.innerWidth,
+  var width = window.innerWidth - (lg.SIDEBAR_WIDTH + 10),
       height = window.innerHeight,
       nodeRadius = 10;
 
@@ -33,7 +33,7 @@ lg.d3 = function () {
     };
   }
 
-  var svg = d3.select("body").insert("svg", ":first-child")
+  var svg = d3.select("#graph").insert("svg", ":first-child")
       .attr("width", width)
       .attr("height", height);
 

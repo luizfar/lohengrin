@@ -41,6 +41,10 @@ lg.build = function (job, number) {
     return self.status === 'success' || self.status === 'failure';
   };
 
+  self.isInProgress = function () {
+    return !self.isDone();
+  };
+
   self.hasFailed = function () {
     return self.status == 'failure';
   };

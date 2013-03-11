@@ -6,8 +6,10 @@ function init() {
       console.debug('Retrieved jobs from Jenkins...');
       console.debug(result);
       var renderer = lg.d3();
+      var sidebar = lg.sidebar();
       lg.onNewBuild(function (build) {
         renderer.redraw();
+        sidebar.addBuild(build);
         build.onUpdate(renderer.redraw);
       });
 

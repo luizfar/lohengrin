@@ -6,6 +6,14 @@ body {
   color: white;
 }
 
+#graph {
+  display: inline-block;
+}
+
+#sidebar {
+  display: inline-block;
+}
+
 @-webkit-keyframes blink
 {
   from { fill: transparent; }
