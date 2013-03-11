@@ -57,6 +57,10 @@ lg.build = function (job, number) {
     return self.job.isRoot();
   };
 
+  self.sameJobAs = function (build) {
+    return self.job.name === build.job.name;
+  };
+
   self.parseJenkinsBuildJson = function (buildJson) {
     self.status = buildJson['building'] ? 'building' : buildJson['result'].toLowerCase();
 

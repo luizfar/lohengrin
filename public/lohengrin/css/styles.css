@@ -13,7 +13,7 @@ body {
 
 #sidebar {
   display: inline-block;
-  float: left;
+  float: right;
 }
 
 @-webkit-keyframes blink

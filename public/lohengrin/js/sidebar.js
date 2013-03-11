@@ -14,8 +14,10 @@ lg.sidebar = function () {
     var dataset = builds;
 
     var rects = svg.selectAll('rect')
-      .data(dataset)
-      .enter()
+      .data(dataset);
+
+    rects.exit().remove();
+    rects.enter()
       .append('rect')
       .attr('x', 0)
       .attr('y', function (d, i) {
@@ -38,9 +40,11 @@ lg.sidebar = function () {
       .attr('stroke', 'black')
       .attr('stroke-width', 2);
 
-    svg.selectAll('text')
-      .data(dataset)
-      .enter()
+    var texts = svg.selectAll('text')
+      .data(dataset);
+
+    texts.exit().remove();
+    texts.enter()
       .append('text')
       .text(function (d) {
         return d.displayName.replace(/^qe_selenium_/i, '');
@@ -66,12 +70,23 @@ lg.sidebar = function () {
     return result;
   };
 
-  self.addBuild = function (build) {
+  function hasBuildNewerThan(build) {
+    return !!(_.find(builds, function (b) {
+      return b.sameJobAs(build) && b.number > build.number;
+    }));
+  }
+
+  function removeBuildsOlderThan(build) {
     builds = _.reject(builds, function (b) {
-      return b.isDone() &&
-        b.job.name === build.job.name &&
-        b.number < build.number;
+      return b.isDone() && b.sameJobAs(build) && b.number < build.number;
     });
+  }
+
+  self.addBuild = function (build) {
+    if (build.isDone() && hasBuildNewerThan(build)) {
+      return;
+    }
+    removeBuildsOlderThan(build);
 
     if (build.isInProgress() || build.hasFailed()) {
       builds.push(build);

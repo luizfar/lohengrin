@@ -3,7 +3,7 @@ var lg = lg || {};
 lg.d3 = function () {
   var self = {};
 
-  var width = window.innerWidth * 0.85,
+  var width = window.innerWidth * 0.85 - 20,
       height = window.innerHeight,
       nodeRadius = 10;
 
@@ -130,7 +130,7 @@ lg.d3 = function () {
     var averageTextSize = 100;
     return {
       x: Math.max(nodeRadius, Math.min(width - nodeRadius - averageTextSize, d.x)),
-      y: Math.max(nodeRadius + averageTextSize, Math.min(height - nodeRadius, d.y))
+      y: Math.max(nodeRadius, Math.min(height - nodeRadius, d.y))
     };
   }
 
