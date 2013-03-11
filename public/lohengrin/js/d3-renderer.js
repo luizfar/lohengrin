@@ -3,7 +3,7 @@ var lg = lg || {};
 lg.d3 = function () {
   var self = {};
 
-  var width = window.innerWidth - (lg.SIDEBAR_WIDTH + 10),
+  var width = window.innerWidth * 0.85,
       height = window.innerHeight,
       nodeRadius = 10;
 

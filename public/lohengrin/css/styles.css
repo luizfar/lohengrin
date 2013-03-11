@@ -8,10 +8,12 @@ body {
 
 #graph {
   display: inline-block;
+  float: left;
 }
 
 #sidebar {
   display: inline-block;
+  float: left;
 }
 
 @-webkit-keyframes blink

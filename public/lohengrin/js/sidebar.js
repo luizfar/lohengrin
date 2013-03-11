@@ -1,14 +1,13 @@
 var lg = lg || {};
 
-lg.SIDEBAR_WIDTH = 200;
-
 lg.sidebar = function () {
   var self = {};
 
   var builds = [];
+  var width = window.innerWidth * 0.15;
 
   var svg = d3.select('#sidebar').insert('svg')
-    .attr('width', 200)
+    .attr('width', width)
     .attr(window.innerHeight);
 
   function redraw() {
@@ -22,7 +21,7 @@ lg.sidebar = function () {
       .attr('y', function (d, i) {
         return i * 30;
       })
-      .attr('width', 200)
+      .attr('width', width)
       .attr('height', 30)
       .attr('fill', function (d) {
         if (d.hasFailed()) {
