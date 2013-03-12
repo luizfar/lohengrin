@@ -16,10 +16,14 @@ lg.sidebar = function () {
     var rects = svg.selectAll('rect')
       .data(dataset);
 
-    rects.exit().remove();
+    rects.exit()
+      .transition()
+      .attr('x', width)
+      .remove();
+
     rects.enter()
       .append('rect')
-      .attr('x', 0)
+      .attr('x', width)
       .attr('y', function (d, i) {
         return i * 30;
       })
@@ -38,18 +42,24 @@ lg.sidebar = function () {
         return 'pink';
       })
       .attr('stroke', 'black')
-      .attr('stroke-width', 2);
+      .attr('stroke-width', 2)
+      .transition()
+      .attr('x', 0);
 
     var texts = svg.selectAll('text')
       .data(dataset);
 
-    texts.exit().remove();
+    texts.exit()
+      .transition()
+      .attr('x', width)
+      .remove();
+
     texts.enter()
       .append('text')
       .text(function (d) {
         return d.displayName.replace(/^qe_selenium_/i, '');
       })
-      .attr("x", 10)
+      .attr("x", width)
       .attr("y", function(d, i) {
          return i * 30 + 20;
       })
@@ -57,7 +67,9 @@ lg.sidebar = function () {
       .attr("font-size", "14px")
       .attr("fill", function (d) {
         return d.isInProgress() ? 'black' : 'white';
-      });
+      })
+      .transition()
+      .attr('x', 10);
   }
 
   function valuesOf(object) {
