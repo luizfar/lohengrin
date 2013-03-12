@@ -4,7 +4,7 @@ lg.build = function (job, number) {
   var self = {};
   var updateListeners = [];
 
-  self.number = number;
+  self.number = parseInt(number);
   self.status = 'unknown';
   self.culprits = '';
   self.job = job;

@@ -70,34 +70,42 @@ lg.sidebar = function () {
     return result;
   };
 
-  function hasBuildNewerThan(build) {
-    return !!(_.find(builds, function (b) {
+  function thereIsABuildNewerThan(build) {
+    return _.some(lg.allBuilds, function (b) {
       return b.sameJobAs(build) && b.number > build.number;
-    }));
+    });
   }
 
   function removeBuildsOlderThan(build) {
     builds = _.reject(builds, function (b) {
       return b.isDone() && b.sameJobAs(build) && b.number < build.number;
     });
+    redraw();
+  }
+
+  function removeBuildByCode(code) {
+    builds = _.reject(builds, function (b) {
+      return b.code == code;
+    });
   }
 
   self.addBuild = function (build) {
-    if (build.isDone() && hasBuildNewerThan(build)) {
+    removeBuildsOlderThan(build);
+    if (build.isDone() && (thereIsABuildNewerThan(build) || !build.hasFailed())) {
       return;
     }
-    removeBuildsOlderThan(build);
 
-    if (build.isInProgress() || build.hasFailed()) {
+    if (build.isInProgress()) {
       builds.push(build);
-      build.onUpdate(function () {
-        if (!build.hasFailed()) {
-          builds = _.reject(builds, function (b) {
-            return b.code === build.code;
-          });
+      build.onUpdate(function (doneBuild) {
+        if (doneBuild.isDone() && !doneBuild.hasFailed()) {
+          removeBuildByCode(doneBuild.code);
         }
-        redraw();
       });
+    }
+
+    if (build.hasFailed()) {
+      builds.push(build);
     }
 
     redraw();
