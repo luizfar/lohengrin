@@ -10,66 +10,79 @@ lg.sidebar = function () {
     .attr('width', width)
     .attr(window.innerHeight);
 
-  function redraw() {
-    var dataset = builds;
+  function buildKey(build) {
+    return build.displayName + build.status;
+  }
 
-    var rects = svg.selectAll('rect')
-      .data(dataset);
-
-    rects.exit()
+  function updateRects(rects) {
+    rects
       .transition()
-      .attr('x', width)
-      .remove();
-
-    rects.enter()
-      .append('rect')
-      .attr('x', width)
       .attr('y', function (d, i) {
         return i * 30;
       })
-      .attr('width', width)
-      .attr('height', 30)
-      .attr('fill', function (d) {
-        if (d.hasFailed()) {
+      .transition()
+      .attr('x', 0)
+      .attr('fill', function (b) {
+        if (b.hasFailed()) {
           return 'red';
         }
-        if (d.isInProgress()) {
+        if (b.isInProgress()) {
           return 'yellow';
         }
-        if (d.hasSucceeded()) {
+        if (b.hasSucceeded()) {
           return 'green';
         }
-        return 'pink';
+        return 'gray';
+      });
+  }
+
+  function updateTexts(texts) {
+    texts
+      .transition()
+      .attr('y', function (d, i) {
+        return i * 30 + 20;
       })
+      .transition()
+      .attr('x', 10);
+  }
+
+  function redraw() {
+    var dataset = builds;
+
+    var allRects = svg.selectAll('rect')
+      .data(dataset, buildKey);
+    var oldRects = allRects.exit();
+    var newRects = allRects.enter().append('rect');
+
+    oldRects.transition().attr('x', width).remove();
+    newRects
+      .attr('width', width)
+      .attr('height', 30)
       .attr('stroke', 'black')
       .attr('stroke-width', 2)
-      .transition()
-      .attr('x', 0);
+      .attr('x', width);
 
-    var texts = svg.selectAll('text')
-      .data(dataset);
+    updateRects(allRects);
+    updateRects(newRects);
 
-    texts.exit()
-      .transition()
-      .attr('x', width)
-      .remove();
+    var allTexts = svg.selectAll('text').data(dataset, buildKey);
+    var oldTexts = allTexts.exit();
+    var newTexts = allTexts.enter().append('text');
 
-    texts.enter()
-      .append('text')
+    oldTexts.transition().attr('x', width).remove();
+    newTexts
       .text(function (d) {
         return d.displayName.replace(/^qe_selenium_/i, '');
       })
       .attr("x", width)
-      .attr("y", function(d, i) {
-         return i * 30 + 20;
-      })
       .attr("font-family", "sans-serif")
       .attr("font-size", "14px")
       .attr("fill", function (d) {
         return d.isInProgress() ? 'black' : 'white';
-      })
-      .transition()
-      .attr('x', 10);
+      });
+
+    updateTexts(allTexts);
+    updateTexts(newTexts);
   }
 
   function valuesOf(object) {
@@ -109,10 +122,14 @@ lg.sidebar = function () {
 
     if (build.isInProgress()) {
       builds.push(build);
-      build.onUpdate(function (doneBuild) {
-        if (doneBuild.isDone() && !doneBuild.hasFailed()) {
-          removeBuildByCode(doneBuild.code);
+      build.onUpdate(function (updatedBuild) {
+        if (updatedBuild.isDone()) {
+          if (!updatedBuild.hasFailed()) {
+            removeBuildByCode(updatedBuild.code);
+          }
+          redraw();
         }
+        redraw();
       });
     }
 
