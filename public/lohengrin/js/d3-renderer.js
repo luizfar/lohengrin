@@ -38,12 +38,20 @@ lg.d3 = function () {
       .attr("height", height);
 
   var force = d3.layout.force()
-      .charge(-240)
-      .linkDistance(20)
+      .gravity(0.02)
+      .charge(-120)
+      .linkDistance(50)
       .size([width, height]);
 
   var forceNodes = force.nodes();
+  
   var forceLinks = force.links();
+
+  var buildsCentroids = [
+    {x: 2 * width/6, y: 2 * height/6},
+    {x: 4 * width/6, y: 2 * height/6},
+    {x: 4 * width/6, y: 4 * height/6},
+    {x: 2 * width/6, y: 4 * height/6}];
 
   function restart() {
     var allLinks = svg.selectAll("line.link")
@@ -110,7 +118,20 @@ lg.d3 = function () {
 
     allNodes.exit().remove();
 
-    force.on("tick", function() {
+    function findHeadBuild(build) {
+      var parentBuilds;
+      parentBuilds = forceLinks.filter(function (link) {
+        return link.target.code === build;
+      });
+
+      if (parentBuilds.length == 0) {
+        return build;
+      }
+
+      return findHeadBuild(parentBuilds[0].source.code);
+    };
+
+    force.on("tick", function(e) {
       linkEnter
         .attr("x1", function(d) { return normalizePosition(d.source).x; })
         .attr("y1", function(d) { return normalizePosition(d.source).y; })
@@ -121,6 +142,38 @@ lg.d3 = function () {
         var position = normalizePosition(d);
         return "translate(" + position.x + "," + position.y + ")";
       });
+
+      var headNodes = forceNodes.filter(
+        function(node) {
+          parentBuilds = forceLinks.filter(function (link) {
+            return link.target.code === node.code;
+          });
+          return parentBuilds.length == 0;
+        });
+
+      headNodes.sort(
+        function(a, b) {
+          if (a.code < b.code)
+            return 1;
+          if (a.code > b.code)
+            return -1;
+          return 0;
+        });
+
+      var k = e.alpha * 0.1;
+      forceNodes.forEach(
+        function(node) {
+          var headBuildCode = findHeadBuild(node.code);
+          var center = buildsCentroids[headNodes.reduce(
+            function( cur, val, index ){
+              if( val.code === headBuildCode && cur === -1 ) {
+                return index;
+              }
+              return cur;
+            }, -1 )];
+          node.x += (center.x - node.x) * k;
+          node.y += (center.y - node.y) * k;
+        });
     });
 
     force.start();
