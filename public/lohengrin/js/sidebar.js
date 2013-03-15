@@ -14,9 +14,37 @@ lg.sidebar = function () {
     return build.displayName + build.status;
   }
 
-  function updateRects(rects) {
-    rects
-      .transition()
+  function redraw() {
+    var rects = svg.selectAll('rect');
+    var rectsWithData = rects.data(builds, buildKey);
+    var texts = svg.selectAll('text');
+    var textsWithData = texts.data(builds, buildKey);
+
+    // remove old builds
+    rectsWithData.exit().transition().attr('x', width).remove();
+    textsWithData.exit().transition().attr('x', width).remove();
+
+    // init new builds
+    rectsWithData.enter()
+      .append('rect')
+      .attr('width', width)
+      .attr('height', 30)
+      .attr('stroke', 'black')
+      .attr('stroke-width', 2)
+      .attr('x', width)
+      .attr('y', -30);
+    textsWithData.enter()
+      .append('text')
+      .text(function (d) {
+        return d.displayName.replace(/^qe_selenium_/i, '');
+      })
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "14px")
+      .attr("x", width)
+      .attr('y', -30);
+
+    // update position
+    rects.transition()
       .attr('y', function (d, i) {
         return i * 30;
       })
@@ -34,55 +62,15 @@ lg.sidebar = function () {
         }
         return 'gray';
       });
-  }
-
-  function updateTexts(texts) {
-    texts
-      .transition()
+    texts.transition()
       .attr('y', function (d, i) {
         return i * 30 + 20;
       })
       .transition()
-      .attr('x', 10);
-  }
-
-  function redraw() {
-    var dataset = builds;
-
-    var allRects = svg.selectAll('rect')
-      .data(dataset, buildKey);
-    var oldRects = allRects.exit();
-    var newRects = allRects.enter().append('rect');
-
-    oldRects.transition().attr('x', width).remove();
-    newRects
-      .attr('width', width)
-      .attr('height', 30)
-      .attr('stroke', 'black')
-      .attr('stroke-width', 2)
-      .attr('x', width);
-
-    updateRects(allRects);
-    updateRects(newRects);
-
-    var allTexts = svg.selectAll('text').data(dataset, buildKey);
-    var oldTexts = allTexts.exit();
-    var newTexts = allTexts.enter().append('text');
-
-    oldTexts.transition().attr('x', width).remove();
-    newTexts
-      .text(function (d) {
-        return d.displayName.replace(/^qe_selenium_/i, '');
-      })
-      .attr("x", width)
-      .attr("font-family", "sans-serif")
-      .attr("font-size", "14px")
+      .attr('x', 10)
       .attr("fill", function (d) {
         return d.isInProgress() ? 'black' : 'white';
       });
-
-    updateTexts(allTexts);
-    updateTexts(newTexts);
   }
 
   function valuesOf(object) {
@@ -103,14 +91,18 @@ lg.sidebar = function () {
 
   function removeBuildsOlderThan(build) {
     builds = _.reject(builds, function (b) {
-      return b.isDone() && b.sameJobAs(build) && b.number < build.number;
+      var shouldRemove = b.isDone() && b.sameJobAs(build) && b.number < build.number;
+      if (shouldRemove) { lg.debug(lg.sidebar, 'Removing old build from sidebar:', b.code); }
+      return shouldRemove;
     });
     redraw();
   }
 
   function removeBuildByCode(code) {
     builds = _.reject(builds, function (b) {
-      return b.code == code;
+      var shouldRemove = b.code == code;
+      if (shouldRemove) { lg.debug(lg.sidebar, 'Removing updated build from sidebar:', b.code); }
+      return shouldRemove;
     });
   }
 
@@ -120,6 +112,8 @@ lg.sidebar = function () {
       return;
     }
 
+    lg.debug(lg.sidebar, 'Adding build to sidebar:', build.code);
+
     if (build.isInProgress()) {
       builds.push(build);
       build.onUpdate(function (updatedBuild) {
@@ -127,7 +121,6 @@ lg.sidebar = function () {
           if (!updatedBuild.hasFailed()) {
             removeBuildByCode(updatedBuild.code);
           }
-          redraw();
         }
         redraw();
       });

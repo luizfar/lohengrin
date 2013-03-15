@@ -1,10 +1,12 @@
 var lg = lg || {};
 
+lg.debugObjects = [lg, lg.build, lg.job, lg.sidebar];
+
 function init() {
   initSettings(function () {
     lg.jenkins.buildJobTree(function (result) {
-      console.debug('Retrieved jobs from Jenkins...');
-      console.debug(result);
+      lg.debug(lg, 'Retrieved jobs from Jenkins...');
+      lg.debug(lg, result);
       var renderer = lg.d3();
       var sidebar = lg.sidebar();
       lg.onNewBuild(function (build) {

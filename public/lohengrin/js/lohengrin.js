@@ -65,3 +65,8 @@ _.extend(lg, (function () {
   return self;
 })());
 
+lg.debug = function (type) {
+  if (lg.debugObjects && _.contains(lg.debugObjects, type)) {
+    console.debug.apply(console, Array.prototype.slice.call(arguments, 1));
+  }
+};

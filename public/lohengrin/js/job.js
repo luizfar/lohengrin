@@ -42,15 +42,15 @@ lg.job = function (name, baseUrlParam) {
   };
 
   self.poll = function () {
-    console.debug('Checking for new builds of job ' + self.name);
+    lg.debug(lg.job, 'Checking for new builds of job ' + self.name);
 
     lg.jenkinsJson(self.url + lg.job.URL_SUFFIX, function (jobJson) {
       var newBuilds = selectNewBuildsIn(jobJson);
 
       if (newBuilds.length) {
-        console.debug('Processing builds for ' + self.name + ': ' + _.pluck(newBuilds, 'number').join(', '));
+        lg.debug(lg.job, 'Processing builds for ' + self.name + ': ' + _.pluck(newBuilds, 'number').join(', '));
       } else {
-        console.debug('Found no new builds for ' + self.name);
+        lg.debug(lg.job, 'Found no new builds for ' + self.name);
       }
 
       _.each(newBuilds, function (build) {
@@ -132,7 +132,7 @@ lg.job = function (name, baseUrlParam) {
   }
 
   function add(build) {
-    console.debug('Adding new build: ' + build.code);
+    lg.debug(lg.job, 'Adding new build: ' + build.code);
     lg.addBuild(build);
     self.builds.push(build);
     if (!build.isDone()) {

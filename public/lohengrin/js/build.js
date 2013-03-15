@@ -92,10 +92,10 @@ lg.build = function (job, number) {
   };
 
   self.checkStatus = function () {
-    console.debug('Checking status of build ' + self.code);
+    lg.debug(lg.build, 'Checking status of build ' + self.code);
     self.load(function () {
       if (self.isDone()) {
-        console.debug('Build ' + self.code + ' finished.');
+        lg.debug(lg.build, 'Build ' + self.code + ' finished.');
         self.updated();
       } else {
         setTimeout(function () { self.checkStatus(); }, 10000);
