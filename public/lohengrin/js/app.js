@@ -1,6 +1,6 @@
 var lg = lg || {};
 
-lg.debugObjects = [lg, lg.build, lg.job, lg.sidebar];
+lg.debugObjects = [lg, lg.sidebar];
 
 function init() {
   initSettings(function () {

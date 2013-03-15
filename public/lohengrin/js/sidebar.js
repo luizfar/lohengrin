@@ -15,14 +15,20 @@ lg.sidebar = function () {
   }
 
   function redraw() {
+    lg.debug(lg.sidebar, 'redrawing sidebar...', builds);
+
     var rects = svg.selectAll('rect');
     var rectsWithData = rects.data(builds, buildKey);
     var texts = svg.selectAll('text');
     var textsWithData = texts.data(builds, buildKey);
 
     // remove old builds
-    rectsWithData.exit().transition().attr('x', width).remove();
-    textsWithData.exit().transition().attr('x', width).remove();
+    rectsWithData.exit().transition().attr('x', width).each('end', function () {
+      rectsWithData.exit().remove();
+    });
+    textsWithData.exit().transition().attr('x', width).each('end', function () {
+      textsWithData.exit().remove();
+    });
 
     // init new builds
     rectsWithData.enter()

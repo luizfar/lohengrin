@@ -8,7 +8,7 @@ lg.jenkinsJson = function (path, callback, tries) {
       try {
         var json = JSON.parse(response);
       } catch (e) {
-        console.error('Error parsing response to ' + path + ': ' + response);
+        console.error('Error parsing response to ' + path + ':', response);
         lg.jenkinsJson(path, callback, tries + 1);
       }
       callback(json);
