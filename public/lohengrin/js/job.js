@@ -71,7 +71,7 @@ lg.job = function (name, baseUrlParam) {
     var builds = getAllJenkinsBuildsIn(jobJson);
 
     if (self.isRoot() && !self.builds.length) {
-      return [builds[0], builds[1]];
+      return [builds[0], builds[1], builds[2], builds[3]];
     }
 
     if (self.builds.length) {
