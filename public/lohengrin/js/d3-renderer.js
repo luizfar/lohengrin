@@ -38,9 +38,16 @@ lg.d3 = function () {
       .attr("height", height);
 
   var force = d3.layout.force()
-      .gravity(0.02)
-      .charge(-120)
-      .linkDistance(50)
+      .gravity(0.1)
+      .charge(-200)
+      .linkDistance(
+        function(link) {
+          if (link.target.numberOfSiblings() > 6) {
+            return 60;
+          } else {
+            return 20;
+          }
+        })
       .size([width, height]);
 
   var forceNodes = force.nodes();
@@ -48,10 +55,10 @@ lg.d3 = function () {
   var forceLinks = force.links();
 
   var buildsCentroids = [
-    {x: 2 * width/6, y: 2 * height/6},
-    {x: 4 * width/6, y: 2 * height/6},
-    {x: 4 * width/6, y: 4 * height/6},
-    {x: 2 * width/6, y: 4 * height/6}];
+    {x: 1 * width/4, y: 1 * height/4},
+    {x: 3 * width/4, y: 1 * height/4},
+    {x: 3 * width/4, y: 3 * height/4},
+    {x: 1 * width/4, y: 3 * height/4}];
 
   function restart() {
     var allLinks = svg.selectAll("line.link")

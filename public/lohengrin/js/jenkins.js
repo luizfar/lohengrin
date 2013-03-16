@@ -101,6 +101,8 @@ lg.jenkins = (function () {
     function findDownstreamJobs(job) {
       processedJobs[job.name] = job;
 
+      var numberOfSiblings = downstreamOf[job.name].length;
+
       _.each(downstreamOf[job.name], function (downstreamProjectName) {
         if (processedJobs[downstreamProjectName]) {
           job.addChild(processedJobs[downstreamProjectName]);
@@ -110,6 +112,7 @@ lg.jenkins = (function () {
           if (child.name === lg.settings.lastJobName) {
             child.isLast = true;
           }
+          child.numberOfSiblings = numberOfSiblings;
           findDownstreamJobs(child);
         }
       });

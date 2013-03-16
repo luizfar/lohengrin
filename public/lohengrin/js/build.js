@@ -57,6 +57,10 @@ lg.build = function (job, number) {
     return self.job.isRoot();
   };
 
+  self.numberOfSiblings = function () {
+    return self.job.numberOfSiblings;
+  };
+
   self.sameJobAs = function (build) {
     return self.job.name === build.job.name;
   };
