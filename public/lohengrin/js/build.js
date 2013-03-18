@@ -9,6 +9,7 @@ lg.build = function (job, number) {
   self.culprits = '';
   self.job = job;
   self.code = lg.build.codeOf(job, number);
+  self.rootBuildsCode = job.isRoot() ? [self.code] : [];
   self.url = self.job.url + '/' + self.number;
   self.started = false;
   self.parsed = false;
@@ -23,6 +24,7 @@ lg.build = function (job, number) {
   self.addChild = function (child) {
     if (!self.hasChild(child)) {
       self.children.push(child);
+      child.rootBuildsCode = child.rootBuildsCode.concat(self.rootBuildsCode);
     }
     if (!child.hasParent(self)) {
       child.parents.push(self);
