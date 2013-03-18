@@ -3,59 +3,79 @@ var lg = lg || {};
 lg.sidebar = function () {
   var self = {};
 
-  var builds = [];
+  var failedBuilds = [];
+  var buildsInProgress = [];
+  var successfulBuilds = [];
+
   var width = window.innerWidth * 0.15;
+
+  var rectHeight = 30;
+  var rectWidth = width;
+
+  var greenRectHeight = 19;
+  var greenRectWidth = width * 0.7;
+
+  var rectHiddenX = width;
+  var rectShownX = 0;
+  var greenRectShownX = width - greenRectWidth;
+  var textHiddenX = width + 10;
+  var textShownX = 10;
+  var greenTextShownX = greenRectShownX + 6;
+
+  var buildPositioner = function (b, i) {
+    var bigBuildsCount = failedBuilds.length + buildsInProgress.length;
+    if (i < bigBuildsCount) {
+      return i * rectHeight;
+    }
+    return rectHeight * bigBuildsCount + (i - bigBuildsCount) * greenRectHeight;
+  };
+
+  var textPositioner = function (t, i) {
+    var bigBuildsCount = failedBuilds.length + buildsInProgress.length;
+    if (i < bigBuildsCount) {
+      return i * rectHeight + 20;
+    }
+    return rectHeight * bigBuildsCount + (i - bigBuildsCount) * greenRectHeight + 13;
+  };
+
+  var scheduledCalls = [];
+  var transitionSemaphore = (function (total) {
+    var s = {};
+    var count = 0;
+    var transitionInProgress = false;
+    s.signal = function () {
+      count++;
+      if (count == total) {
+        transitionInProgress = false;
+        count = 0;
+      }
+    };
+    s.reset = function () {
+      transitionInProgress = true;
+      count = 0;
+    };
+    s.inProgress = function () {
+      return transitionInProgress;
+    };
+    return s;
+  })(2);
 
   var svg = d3.select('#sidebar').insert('svg')
     .attr('width', width)
     .attr(window.innerHeight);
 
   function buildKey(build) {
-    return build.displayName + build.status;
+    return build.code + '-' + build.status;
   }
 
-  function redraw() {
-    lg.debug(lg.sidebar, 'redrawing sidebar...', builds);
-
-    var rects = svg.selectAll('rect');
-    var rectsWithData = rects.data(builds, buildKey);
-    var texts = svg.selectAll('text');
-    var textsWithData = texts.data(builds, buildKey);
-
-    // remove old builds
-    rectsWithData.exit().transition().attr('x', width).each('end', function () {
-      rectsWithData.exit().remove();
-    });
-    textsWithData.exit().transition().attr('x', width).each('end', function () {
-      textsWithData.exit().remove();
-    });
-
-    // init new builds
-    rectsWithData.enter()
+  function initNewRects(rectsEnter) {
+    rectsEnter
       .append('rect')
-      .attr('width', width)
-      .attr('height', 30)
+      .attr('width', function (b) { return b.hasSucceeded() ? greenRectWidth : rectWidth; })
+      .attr('height', function (b) { return b.hasSucceeded() ? greenRectHeight : rectHeight; })
       .attr('stroke', 'black')
       .attr('stroke-width', 2)
-      .attr('x', width)
-      .attr('y', -30);
-    textsWithData.enter()
-      .append('text')
-      .text(function (d) {
-        return d.displayName.replace(/^qe_selenium_/i, '');
-      })
-      .attr("font-family", "sans-serif")
-      .attr("font-size", "14px")
-      .attr("x", width)
-      .attr('y', -30);
-
-    // update position
-    rects.transition()
-      .attr('y', function (d, i) {
-        return i * 30;
-      })
-      .transition()
-      .attr('x', 0)
+      .attr('x', rectHiddenX)
       .attr('fill', function (b) {
         if (b.hasFailed()) {
           return 'red';
@@ -68,26 +88,74 @@ lg.sidebar = function () {
         }
         return 'gray';
       });
-    texts.transition()
-      .attr('y', function (d, i) {
-        return i * 30 + 20;
+  }
+
+  function initNewTexts(textsEnter) {
+    textsEnter
+      .append('text')
+      .text(function (d) {
+        return d.displayName.replace(/^qe_selenium_/i, '');
       })
-      .transition()
-      .attr('x', 10)
-      .attr("fill", function (d) {
-        return d.isInProgress() ? 'black' : 'white';
+      .attr("font-family", "sans-serif")
+      .attr("font-size", function (b) { return b.hasSucceeded()  ? "10px" : "14px"; })
+      .attr("x", width)
+      .attr("fill", function (b) {
+        return b.isInProgress() ? 'black' : 'white';
       });
   }
 
-  function valuesOf(object) {
-    var result = [];
-    for (var key in object) {
-      if (object.hasOwnProperty(key)) {
-        result.push(object[key]);
-      }
+  function allBuilds() {
+    return failedBuilds.concat(buildsInProgress.concat(successfulBuilds));
+  }
+
+  function reset() {
+    var builds = allBuilds();
+    lg.debug(lg.sidebar, 'Resetting the sidebar...', builds);
+
+    transitionSemaphore.reset();
+    svg.selectAll('rect').remove();
+    svg.selectAll('text').remove();
+
+    var rects = svg.selectAll('rect').data(builds, buildKey);
+    initNewRects(rects.enter());
+
+    var texts = svg.selectAll('text').data(builds, buildKey);
+    initNewTexts(texts.enter());
+
+    rects
+      .attr('y', buildPositioner)
+      .transition()
+      .attr('x', function (b) { return b.hasSucceeded() ? greenRectShownX : rectShownX; })
+      .each('end', transitionSemaphore.signal);
+
+    texts
+      .attr('y', textPositioner)
+      .transition()
+      .attr('x', function (b) { return b.hasSucceeded() ? greenTextShownX : textShownX; })
+      .each('end', transitionSemaphore.signal);
+  }
+
+  function addCompletedBuild(build) {
+    if (thereIsABuildNewerThan(build)) {
+      return;
     }
-    return result;
-  };
+    lg.debug(lg.sidebar, 'Adding completed build to sidebar:', build.code);
+    removeBuildsOlderThan(build);
+    pushBuild(build);
+  }
+
+  function addBuildInProgress(build) {
+    removeBuildsOlderThan(build);
+    lg.debug(lg.sidebar, 'Adding in progress build to sidebar:', build.code);
+    pushBuild(build);
+    build.onUpdate(function (updated) {
+      if (updated.isDone()) {
+        removeBuildByCode(updated.code);
+        addCompletedBuild(updated);
+        scheduleUpdate();
+      }
+    });
+  }
 
   function thereIsABuildNewerThan(build) {
     return _.some(lg.allBuilds, function (b) {
@@ -96,48 +164,106 @@ lg.sidebar = function () {
   }
 
   function removeBuildsOlderThan(build) {
-    builds = _.reject(builds, function (b) {
-      var shouldRemove = b.isDone() && b.sameJobAs(build) && b.number < build.number;
-      if (shouldRemove) { lg.debug(lg.sidebar, 'Removing old build from sidebar:', b.code); }
-      return shouldRemove;
+    remove(function (b) {
+      return b.isDone() && b.sameJobAs(build) && b.number < build.number;
     });
-    redraw();
   }
 
   function removeBuildByCode(code) {
-    builds = _.reject(builds, function (b) {
-      var shouldRemove = b.code == code;
-      if (shouldRemove) { lg.debug(lg.sidebar, 'Removing updated build from sidebar:', b.code); }
-      return shouldRemove;
-    });
+    remove(function (b) { return b.code === code; });
+  }
+
+  function remove(remover) {
+    buildsInProgress = _.reject(buildsInProgress, remover);
+    failedBuilds = _.reject(failedBuilds, remover);
+    successfulBuilds = _.reject(successfulBuilds, remover);
+  }
+
+  function pushBuild(build) {
+    if (build.isInProgress()) {
+      buildsInProgress.push(build);
+    } else if (build.hasFailed()) {
+      failedBuilds.push(build);
+    } else if (build.hasSucceeded()) {
+      successfulBuilds.push(build);
+    }
+    scheduleUpdate();
+  }
+
+  function schedule(callback) {
+    if (transitionSemaphore.inProgress()) {
+      if (!_.contains(scheduledCalls, callback)) {
+        lg.debug(lg.sidebar, 'Update already in progress. Sheduling new update...');
+        scheduledCalls.push(callback);
+        tryToExecuteScheduledCalls();
+      }
+    } else {
+      transitionSemaphore.reset();
+      callback();
+    }
+  }
+
+  function tryToExecuteScheduledCalls() {
+    if (scheduledCalls.length) {
+      if (transitionSemaphore.inProgress()) {
+        setTimeout(tryToExecuteScheduledCalls, 500);
+      } else {
+        transitionSemaphore.reset();
+        scheduledCalls.shift()();
+      }
+    }
+  }
+
+  function scheduleUpdate() {
+    schedule(reset);
+  }
+
+  function scheduleReset() {
+    schedule(reset);
   }
 
   self.addBuild = function (build) {
-    removeBuildsOlderThan(build);
-    if (build.isDone() && (thereIsABuildNewerThan(build) || !build.hasFailed())) {
-      return;
+    if (build.isDone()) {
+      addCompletedBuild(build);
+    } else {
+      addBuildInProgress(build);
     }
-
-    lg.debug(lg.sidebar, 'Adding build to sidebar:', build.code);
-
-    if (build.isInProgress()) {
-      builds.push(build);
-      build.onUpdate(function (updatedBuild) {
-        if (updatedBuild.isDone()) {
-          if (!updatedBuild.hasFailed()) {
-            removeBuildByCode(updatedBuild.code);
-          }
-        }
-        redraw();
-      });
-    }
-
-    if (build.hasFailed()) {
-      builds.push(build);
-    }
-
-    redraw();
   };
+
+  function initBrowserVisibilityChangeListener() {
+    $(function() {
+      var hidden, visibilityState, visibilityChange;
+
+      if (typeof document.hidden !== "undefined") {
+        hidden = "hidden";
+        visibilityChange = "visibilitychange";
+        visibilityState = "visibilityState";
+      }
+      else if (typeof document.mozHidden !== "undefined") {
+        hidden = "mozHidden";
+        visibilityChange = "mozvisibilitychange";
+        visibilityState = "mozVisibilityState";
+      }
+      else if (typeof document.msHidden !== "undefined") {
+        hidden = "msHidden";
+        visibilityChange = "msvisibilitychange";
+        visibilityState = "msVisibilityState";
+      }
+      else if (typeof document.webkitHidden !== "undefined") {
+        hidden = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
+        visibilityState = "webkitVisibilityState";
+      }
+
+      document.addEventListener(visibilityChange, function() {
+        if (document[visibilityState] == 'visible') {
+          scheduleReset();
+        }
+      });
+    });
+  }
+
+  initBrowserVisibilityChangeListener();
 
   return self;
 };
