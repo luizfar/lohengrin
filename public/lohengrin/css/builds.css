@@ -13,8 +13,14 @@
   to { fill: yellow; -webkit-transform: scale(1.5,1.5); }
 }
 
+@-webkit-keyframes fadeout {
+  from { opacity: 1; }
+  to { opacity: 0.01; }
+}
+
 .node {
   stroke-width: 1px;
+  -webkit-animation: fadeout 3600s linear 60s;
 }
 .last {
   stroke-width: 5px;
