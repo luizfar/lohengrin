@@ -1,8 +1,7 @@
 body {
   margin:0px;
   font-family:verdana;
-  background: black;
-  background: -webkit-radial-gradient(circle, #000, #333);
+  background: #111;
   color: white;
 }
 

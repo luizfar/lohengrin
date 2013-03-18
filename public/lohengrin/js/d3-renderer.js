@@ -39,7 +39,7 @@ lg.d3 = function () {
 
   var force = d3.layout.force()
       .gravity(0.1)
-      .charge(-200)
+      .charge(-240)
       .linkDistance(
         function(link) {
           if (link.target.numberOfSiblings() > 6) {
@@ -168,8 +168,12 @@ lg.d3 = function () {
       var k = e.alpha * 0.1;
       forceNodes.forEach(
         function(node) {
-          node.rootBuildsCode.forEach(function(rootBuild) {
-            var screenPosition = headNodes.indexOf(lg.buildsByCode[rootBuild]);
+          node.rootBuildsCode.forEach(function(rootBuildCode) {
+            var rootBuild = forceNodes.filter(
+              function (build) {
+                return build.code == rootBuildCode;
+              })[0];
+            var screenPosition = headNodes.indexOf(rootBuild);
             var center = buildsCentroids[screenPosition];
             node.x += (center.x - node.x) * k;
             node.y += (center.y - node.y) * k;
