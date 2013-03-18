@@ -14,8 +14,8 @@
 }
 
 @-webkit-keyframes fadeout {
-  from { opacity: 1; }
-  to { opacity: 0.01; }
+  from { fill-opacity: 1; }
+  to { fill-opacity: 0.01; }
 }
 
 .node {
