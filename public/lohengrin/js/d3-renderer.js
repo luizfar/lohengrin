@@ -58,7 +58,8 @@ lg.d3 = function () {
     {x: 1 * width/4, y: 1 * height/4},
     {x: 3 * width/4, y: 1 * height/4},
     {x: 3 * width/4, y: 3 * height/4},
-    {x: 1 * width/4, y: 3 * height/4}];
+    {x: 1 * width/4, y: 3 * height/4},
+    {x: 0 * width/4, y: 4 * height/4}];
 
   function restart() {
     var allLinks = svg.selectAll("line.link")
@@ -152,10 +153,7 @@ lg.d3 = function () {
 
       var headNodes = forceNodes.filter(
         function(node) {
-          parentBuilds = forceLinks.filter(function (link) {
-            return link.target.code === node.code;
-          });
-          return parentBuilds.length == 0;
+          return node.isRoot();
         });
 
       headNodes.sort(
@@ -170,16 +168,12 @@ lg.d3 = function () {
       var k = e.alpha * 0.1;
       forceNodes.forEach(
         function(node) {
-          var headBuildCode = findHeadBuild(node.code);
-          var center = buildsCentroids[headNodes.reduce(
-            function( cur, val, index ){
-              if( val.code === headBuildCode && cur === -1 ) {
-                return index;
-              }
-              return cur;
-            }, -1 )];
-          node.x += (center.x - node.x) * k;
-          node.y += (center.y - node.y) * k;
+          node.rootBuildsCode.forEach(function(rootBuild) {
+            var screenPosition = headNodes.indexOf(lg.buildsByCode[rootBuild]);
+            var center = buildsCentroids[screenPosition];
+            node.x += (center.x - node.x) * k;
+            node.y += (center.y - node.y) * k;
+          });
         });
     });
 
