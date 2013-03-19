@@ -40,7 +40,7 @@ lg.build = function (job, number) {
   };
 
   self.isDone = function () {
-    return self.status === 'success' || self.status === 'failure';
+    return self.status === 'success' || self.status === 'failure' || self.status === 'aborted';
   };
 
   self.isInProgress = function () {
@@ -53,6 +53,10 @@ lg.build = function (job, number) {
 
   self.hasSucceeded = function () {
     return self.status == 'success';
+  };
+
+  self.wasAborted = function () {
+    return self.status == 'aborted';
   };
 
   self.isRoot = function () {

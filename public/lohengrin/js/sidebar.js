@@ -63,11 +63,12 @@ lg.sidebar = function () {
   function initNewRects(rectsEnter) {
     rectsEnter
       .append('rect')
-      .attr('width', function (b) { return b.hasSucceeded() ? greenRectWidth : rectWidth; })
-      .attr('height', function (b) { return b.hasSucceeded() ? greenRectHeight : rectHeight; })
+      .attr('width', function (b) { return b.hasFailed() || b.isInProgress() ? rectWidth : greenRectWidth; })
+      .attr('height', function (b) { return b.hasFailed() || b.isInProgress() ? rectHeight : greenRectHeight; })
       .attr('stroke', 'black')
       .attr('stroke-width', 2)
       .attr('x', rectHiddenX)
+      .attr('y', -rectHeight)
       .attr('class', 'enter update')
       .attr('fill', function (b) {
         if (b.hasFailed()) {
@@ -88,11 +89,14 @@ lg.sidebar = function () {
       .append('text')
       .attr('class', 'enter update')
       .text(function (d) {
-        return d.displayName.replace(/^qe_selenium_/i, '');
+        return d.displayName
+          .replace(/^qe_selenium_/i, '')
+          .replace(/^acceptance_/i, '');
       })
       .attr("font-family", "sans-serif")
-      .attr("font-size", function (b) { return b.hasSucceeded()  ? "10px" : "14px"; })
+      .attr("font-size", function (b) { return b.hasFailed() || b.isInProgress() ? "14px" : "10px"; })
       .attr("x", width)
+      .attr('y', -rectHeight)
       .attr("fill", function (b) {
         return b.isInProgress() ? 'black' : 'white';
       });
@@ -229,7 +233,7 @@ lg.sidebar = function () {
       buildsInProgress.push(build);
     } else if (build.hasFailed()) {
       failedBuilds.push(build);
-    } else if (build.hasSucceeded()) {
+    } else {
       successfulBuilds.push(build);
     }
     scheduleUpdate();
