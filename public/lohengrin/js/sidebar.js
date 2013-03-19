@@ -22,43 +22,35 @@ lg.sidebar = function () {
   var textShownX = 10;
   var greenTextShownX = greenRectShownX + 6;
 
-  var buildPositioner = function (b, i) {
+  var buildYPositioner = function (b) {
     var bigBuildsCount = failedBuilds.length + buildsInProgress.length;
+    var i = b.indexInSidebar;
     if (i < bigBuildsCount) {
       return i * rectHeight;
     }
     return rectHeight * bigBuildsCount + (i - bigBuildsCount) * greenRectHeight;
   };
 
-  var textPositioner = function (t, i) {
+  var buildXPositioner = function (b) {
+    return b.hasSucceeded() ? greenRectShownX : rectShownX;
+  };
+
+  var textYPositioner = function (b) {
     var bigBuildsCount = failedBuilds.length + buildsInProgress.length;
+    var i = b.indexInSidebar;
     if (i < bigBuildsCount) {
       return i * rectHeight + 20;
     }
     return rectHeight * bigBuildsCount + (i - bigBuildsCount) * greenRectHeight + 13;
   };
 
+  var textXPositioner = function (b) {
+    return b.hasSucceeded() ? greenTextShownX : textShownX;
+  };
+
   var scheduledCalls = [];
-  var transitionSemaphore = (function (total) {
-    var s = {};
-    var count = 0;
-    var transitionInProgress = false;
-    s.signal = function () {
-      count++;
-      if (count == total) {
-        transitionInProgress = false;
-        count = 0;
-      }
-    };
-    s.reset = function () {
-      transitionInProgress = true;
-      count = 0;
-    };
-    s.inProgress = function () {
-      return transitionInProgress;
-    };
-    return s;
-  })(2);
+
+  var transitionSemaphore = lg.semaphore(2);
 
   var svg = d3.select('#sidebar').insert('svg')
     .attr('width', width)
@@ -76,6 +68,7 @@ lg.sidebar = function () {
       .attr('stroke', 'black')
       .attr('stroke-width', 2)
       .attr('x', rectHiddenX)
+      .attr('class', 'enter update')
       .attr('fill', function (b) {
         if (b.hasFailed()) {
           return 'red';
@@ -93,6 +86,7 @@ lg.sidebar = function () {
   function initNewTexts(textsEnter) {
     textsEnter
       .append('text')
+      .attr('class', 'enter update')
       .text(function (d) {
         return d.displayName.replace(/^qe_selenium_/i, '');
       })
@@ -104,13 +98,9 @@ lg.sidebar = function () {
       });
   }
 
-  function allBuilds() {
-    return failedBuilds.concat(buildsInProgress.concat(successfulBuilds));
-  }
-
-  function reset() {
+  function redraw() {
     var builds = allBuilds();
-    lg.debug(lg.sidebar, 'Resetting the sidebar...', builds);
+    lg.debug(lg.sidebar, 'Redrawing the whole sidebar...', builds);
 
     transitionSemaphore.reset();
     svg.selectAll('rect').remove();
@@ -123,16 +113,71 @@ lg.sidebar = function () {
     initNewTexts(texts.enter());
 
     rects
-      .attr('y', buildPositioner)
+      .attr('y', buildYPositioner)
       .transition()
-      .attr('x', function (b) { return b.hasSucceeded() ? greenRectShownX : rectShownX; })
+      .attr('x', buildXPositioner)
       .each('end', transitionSemaphore.signal);
 
     texts
-      .attr('y', textPositioner)
+      .attr('y', textYPositioner)
       .transition()
-      .attr('x', function (b) { return b.hasSucceeded() ? greenTextShownX : textShownX; })
+      .attr('x', textXPositioner)
       .each('end', transitionSemaphore.signal);
+  }
+
+  function allBuilds() {
+    var r = failedBuilds.concat(buildsInProgress.concat(successfulBuilds));
+    _.each(r, function (b, i) { b.indexInSidebar = i; });
+    return r;
+  }
+
+  function update() {
+    var builds = allBuilds();
+    lg.debug(lg.sidebar, 'Updating the sidebar...', builds);
+
+    transitionSemaphore.reset();
+
+    var rects = svg.selectAll('rect.update').attr('class', 'update');
+    var rectsData = rects.data(builds, buildKey);
+
+    rectsData.exit().attr('class', 'exit');
+    svg.selectAll('rect.exit').transition().attr('x', width).each('end', function () {
+      svg.selectAll('rect.exit').remove();
+    });
+
+    initNewRects(rectsData.enter());
+
+    svg.selectAll('rect.update')
+      .transition()
+        .delay(250)
+        .attr('y', buildYPositioner);
+
+    svg.selectAll('rect.enter')
+      .transition()
+        .delay(750)
+        .attr('x', buildXPositioner)
+        .each('end', transitionSemaphore.signal);
+
+    var texts = svg.selectAll('text.update').attr('class', 'update');
+    var textsData = texts.data(builds, buildKey);
+
+    textsData.exit().attr('class', 'exit');
+    svg.selectAll('text.exit').transition().attr('x', width).each('end', function () {
+      svg.selectAll('text.exit').remove();
+    });
+
+    initNewTexts(textsData.enter());
+
+    svg.selectAll('text.update')
+      .transition()
+        .delay(250)
+        .attr('y', textYPositioner);
+
+    svg.selectAll('text.enter')
+      .transition()
+        .delay(750)
+        .attr('x', textXPositioner)
+        .each('end', transitionSemaphore.signal);
   }
 
   function addCompletedBuild(build) {
@@ -198,7 +243,6 @@ lg.sidebar = function () {
         tryToExecuteScheduledCalls();
       }
     } else {
-      transitionSemaphore.reset();
       callback();
     }
   }
@@ -208,18 +252,17 @@ lg.sidebar = function () {
       if (transitionSemaphore.inProgress()) {
         setTimeout(tryToExecuteScheduledCalls, 500);
       } else {
-        transitionSemaphore.reset();
         scheduledCalls.shift()();
       }
     }
   }
 
   function scheduleUpdate() {
-    schedule(reset);
+    schedule(update);
   }
 
-  function scheduleReset() {
-    schedule(reset);
+  function scheduleRedraw() {
+    schedule(redraw);
   }
 
   self.addBuild = function (build) {
@@ -257,7 +300,7 @@ lg.sidebar = function () {
 
       document.addEventListener(visibilityChange, function() {
         if (document[visibilityState] == 'visible') {
-          scheduleReset();
+          scheduleRedraw();
         }
       });
     });
@@ -268,3 +311,28 @@ lg.sidebar = function () {
   return self;
 };
 
+lg.semaphore = function (total, callback) {
+  var self = {};
+  var count = 0;
+  var inProgress = false;
+
+  self.signal = function () {
+    count++;
+    if (count === total) {
+      count = 0;
+      inProgress = false;
+      callback && callback();
+    }
+  };
+
+  self.reset = function () {
+    count = 0;
+    inProgress = true;
+  };
+
+  self.inProgress = function () {
+    return inProgress;
+  };
+
+  return self;
+};
