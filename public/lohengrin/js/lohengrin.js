@@ -56,8 +56,7 @@ _.extend(lg, (function () {
     self.rootBuilds.length = 0;
     _.each(nonStaleRoots, function (b) { self.rootBuilds.push(b); });
 
-    var root = self.rootBuilds.shift();
-    markToRemove(root);
+    markToRemove(staleRoot);
     _.each(self.allBuilds, function (build) {
       if (build.stale) {
         delete self.buildsByCode[build.code];
