@@ -137,16 +137,22 @@ lg.jenkins = (function () {
     return cleanupRemovedChildrenFrom(result);
   }
 
+  self.hasJob = function (jobName) {
+    return _.some(self.jobTree.allJobs, function (job) {
+      return job.name === jobName;
+    });
+  };
+
   self.buildJobTree = function (callback) {
     lg.jenkinsJson('api/json?tree=jobs[name,downstreamProjects[name],upstreamProjects[name]]', function (json) {
       var jobs = buildJobTreeFrom(json);
 
-      var result = {
+      self.jobTree = {
         allJobs: jobs,
         root: jobs[lg.settings.rootJobName]
       };
 
-      callback(result);
+      callback(self.jobTree);
     });
   };
 

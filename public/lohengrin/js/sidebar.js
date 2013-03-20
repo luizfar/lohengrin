@@ -1,5 +1,25 @@
 var lg = lg || {};
 
+lg.sidebarSizes = (function () {
+  var self = {};
+
+  self.width = window.innerWidth * 0.15;
+
+  self.bigRectHeight = 30;
+  self.bigRectWidth = self.width;
+
+  self.smallRectHeight = 19;
+  self.smallRectWidth = self.width * 0.7;
+
+  self.bigRectX = 0;
+  self.smallRectX = self.width - self.smallRectWidth;
+
+  self.bigTextX = 10;
+  self.smallTextX = self.smallRectX + 6;
+
+  return self;
+}) ();
+
 lg.sidebar = function () {
   var self = {};
 
@@ -7,141 +27,56 @@ lg.sidebar = function () {
   var buildsInProgress = [];
   var successfulBuilds = [];
 
-  var width = window.innerWidth * 0.15;
-
-  var bigRectHeight = 30;
-  var bigRectWidth = width;
-
-  var smallRectHeight = 19;
-  var smallRectWidth = width * 0.7;
-
-  var bigRectX = 0;
-  var smallRectX = width - smallRectWidth;
-
-  var bigTextX = 10;
-  var smallTextX = smallRectX + 6;
+  var width = lg.sidebarSizes.width;
 
   var transitionSemaphore = lg.semaphore(2);
 
   var updateScheduled = false;
   var redrawScheduled = false;
 
+  var initializers = {
+    rect: initNewRects,
+    text: initNewTexts
+  };
+
   var svg = d3.select('#sidebar').insert('svg')
     .attr('width', width)
     .attr(window.innerHeight);
 
-  function buildKey(build) {
-    return build.code + '-' + build.status;
-  }
-
-  function isBig(build) {
-    return build.hasFailed() || build.isInProgress();
-  }
-
-  function initNewRects(rectsEnter) {
-    var rects = rectsEnter.append('rect');
-    rects
-      .attr('stroke', 'black')
-      .attr('stroke-width', 2)
-      .attr('x', bigRectWidth)
-      .attr('y', -bigRectHeight)
-      .attr('class', 'fresh enter');
-    updateRects(rects);
-  }
-
-  function updateRects(rects) {
-    rects
-      .attr('width', function (b) { return isBig(b) ? bigRectWidth : smallRectWidth; })
-      .attr('height', function (b) { return isBig(b) ? bigRectHeight : smallRectHeight; })
-      .attr('title', buildKey)
-      .attr('fill', function (b) {
-        if (b.hasFailed()) {
-          return 'red';
-        }
-        if (b.isInProgress()) {
-          return 'yellow';
-        }
-        if (b.hasSucceeded()) {
-          return 'green';
-        }
-        return 'gray';
-      });
-  }
-
-  function initNewTexts(textsEnter) {
-    var texts = textsEnter.append('text');
-    texts
-      .attr('class', 'fresh enter')
-      .text(function (d) {
-        return d.displayName
-          .replace(/^qe_selenium_/i, '')
-          .replace(/^acceptance_/i, '');
-      })
-      .attr("font-family", "sans-serif")
-      .attr("x", bigRectWidth)
-      .attr('y', -bigRectHeight);
-    updateTexts(texts);
-  }
-
-  function updateTexts(texts) {
-    texts
-      .attr("font-size", function (b) { return isBig(b) ? "14px" : "10px"; })
-      .attr('title', buildKey)
-      .attr("fill", function (b) {
-        return b.isInProgress() || b.wasAborted() ? 'black' : 'white';
-      });
-  }
-
-  function rectYPositioner(b) {
-    var bigBuildsCount = failedBuilds.length + buildsInProgress.length;
-    var i = b.indexInSidebar;
-    if (i < bigBuildsCount) {
-      return i * bigRectHeight;
-    }
-    return bigRectHeight * bigBuildsCount + (i - bigBuildsCount) * smallRectHeight;
-  }
-
-  function rectXPositioner(b) {
-    return b.hasSucceeded() || b.wasAborted() ? smallRectX : bigRectX;
-  }
-
-  function textYPositioner(b) {
-    var bigBuildsCount = failedBuilds.length + buildsInProgress.length;
-    var i = b.indexInSidebar;
-    if (i < bigBuildsCount) {
-      return i * bigRectHeight + 20;
-    }
-    return bigRectHeight * bigBuildsCount + (i - bigBuildsCount) * smallRectHeight + 13;
-  }
-
-  function textXPositioner(b) {
-    return b.hasSucceeded() || b.wasAborted() ? smallTextX : bigTextX;
-  }
-
   function redraw() {
-    svg.selectAll('rect').remove();
-    svg.selectAll('text').remove();
+    hideEverything();
     update();
   }
 
-  var elementsOperators = {
-    initializer: {
-      rect: initNewRects,
-      text: initNewTexts
-    },
-    updater: {
-      rect: updateRects,
-      text: updateTexts
-    },
-    yPositioner: {
-      rect: rectYPositioner,
-      text: textYPositioner
-    },
-    xPositioner: {
-      rect: rectXPositioner,
-      text: textXPositioner
-    }
-  };
+  function hideEverything() {
+    svg.selectAll('rect').remove();
+    svg.selectAll('text').remove();
+  }
+
+  function initNewRects(rectsEnter) {
+    rectsEnter.append('rect')
+      .attr('stroke', 'black')
+      .attr('stroke-width', 2)
+      .attr('x', lg.sidebarSizes.width)
+      .attr('y', -lg.sidebarSizes.bigRectHeight)
+      .attr('class', 'fresh enter')
+      .attr('width', function (b) { return b.width; })
+      .attr('height', function (b) { return b.height; })
+      .attr('title', function (b) { return b.displayName; })
+      .attr('fill', function (b) { return b.color; });
+  }
+
+  function initNewTexts(textsEnter) {
+    textsEnter.append('text')
+      .attr('class', 'fresh enter')
+      .attr("font-family", "sans-serif")
+      .attr("x", lg.sidebarSizes.width)
+      .attr('y', -lg.sidebarSizes.bigRectHeight)
+      .text(function (b) { return b.displayName; })
+      .attr("font-size", function (b) { return b.fontSize; })
+      .attr('title', function (b) { return b.displayName; })
+      .attr("fill", function (b) { return b.textColor; });
+  }
 
   function updateElements(type, builds) {
     var freshSelector = type + '.fresh';
@@ -149,30 +84,32 @@ lg.sidebar = function () {
     var enterSelector = type + '.enter';
 
     var all = svg.selectAll(freshSelector).attr('class', 'fresh');
-    var allWithData = all.data(builds, buildKey);
+    var allWithData = all.data(builds, function (b) { return b.id; });
 
-    allWithData.exit().attr('class', 'exit').remove();
+    allWithData.exit().attr('class', 'exit');
     svg.selectAll(exitSelector).transition().attr('x', width).each('end', function () {
       svg.selectAll(exitSelector).remove();
     });
 
-    elementsOperators.updater[type](all);
-    elementsOperators.initializer[type](allWithData.enter());
+    initializers[type](allWithData.enter());
 
-    var fresh = svg.selectAll(freshSelector);
-    if (fresh.empty()) {
+    svg.selectAll(freshSelector)
+      .transition()
+        .delay(200)
+        .attr('y', function (b) { return b.yPosition(type); })
+
+    var newRects = svg.selectAll(enterSelector);
+
+    if (newRects.empty()) {
       transitionSemaphore.signal();
     } else {
-      var eachTransitionSemaphore = lg.semaphore(fresh[0].length, function () {
+      var eachTransitionSemaphore = lg.semaphore(newRects[0].length, function () {
         transitionSemaphore.signal();
       });
-      fresh
-        .transition()
-          .delay(200)
-          .attr('y', elementsOperators.yPositioner[type])
+      newRects
         .transition()
           .delay(500)
-          .attr('x', elementsOperators.xPositioner[type])
+          .attr('x', function (b) { return b.xPosition(type); })
           .each('end', eachTransitionSemaphore.signal);
     }
   }
@@ -188,64 +125,9 @@ lg.sidebar = function () {
   }
 
   function allBuilds() {
-    var r = failedBuilds.concat(buildsInProgress.concat(successfulBuilds));
-    _.each(r, function (b, i) { b.indexInSidebar = i; });
-    return r;
-  }
-
-  function addCompletedBuild(build) {
-    if (thereIsABuildNewerThan(build)) {
-      return;
-    }
-    lg.debug(lg.sidebar, 'Adding completed build to sidebar:', build.code);
-    removeBuildsOlderThan(build);
-    pushBuild(build);
-  }
-
-  function addBuildInProgress(build) {
-    removeBuildsOlderThan(build);
-    lg.debug(lg.sidebar, 'Adding in progress build to sidebar:', build.code);
-    pushBuild(build);
-    build.onUpdate(function (updated) {
-      if (updated.isDone()) {
-        removeBuildByCode(updated.code);
-        addCompletedBuild(updated);
-        scheduleUpdate();
-      }
-    });
-  }
-
-  function thereIsABuildNewerThan(build) {
-    return _.some(lg.allBuilds, function (b) {
-      return b.sameJobAs(build) && b.number > build.number;
-    });
-  }
-
-  function removeBuildsOlderThan(build) {
-    remove(function (b) {
-      return b.isDone() && b.sameJobAs(build) && b.number < build.number;
-    });
-  }
-
-  function removeBuildByCode(code) {
-    remove(function (b) { return b.code === code; });
-  }
-
-  function remove(remover) {
-    buildsInProgress = _.reject(buildsInProgress, remover);
-    failedBuilds = _.reject(failedBuilds, remover);
-    successfulBuilds = _.reject(successfulBuilds, remover);
-  }
-
-  function pushBuild(build) {
-    if (build.isInProgress()) {
-      buildsInProgress.push(build);
-    } else if (build.hasFailed()) {
-      failedBuilds.push(build);
-    } else {
-      successfulBuilds.push(build);
-    }
-    scheduleUpdate();
+    var all = failedBuilds.concat(buildsInProgress.concat(successfulBuilds));
+    var bigBuildsCount = failedBuilds.length + buildsInProgress.length;
+    return _.map(all, function (build, index) { return lg.sidebarBuild(build, index, bigBuildsCount); });
   }
 
   function scheduleUpdate() {
@@ -273,6 +155,22 @@ lg.sidebar = function () {
       redrawScheduled = false;
     }
   }
+
+  self.start = function () {
+    lg.jenkinsJson('api/json?tree=jobs[name,url,color,lastBuild[number]]', function (json) {
+      failedBuilds = _.filter(json.jobs, function (job) {
+        return job.color === 'red' && lg.jenkins.hasJob(job.name);
+      });
+      buildsInProgress = _.filter(json.jobs, function (job) {
+        return job.color.indexOf('anime') >= 0 && lg.jenkins.hasJob(job.name);
+      });
+      successfulBuilds = _.filter(json.jobs, function (job) {
+        return job.color !== 'red' && job.color.indexOf('anime') == -1 && lg.jenkins.hasJob(job.name);
+      });
+      scheduleUpdate();
+      setTimeout(self.start, 30000);
+    });
+  };
 
   self.addBuild = function (build) {
     if (build.isDone()) {
@@ -311,11 +209,82 @@ lg.sidebar = function () {
         if (document[visibilityState] == 'visible') {
           scheduleRedraw();
         }
+        if (document[visibilityState] == 'hidden') {
+          hideEverything();
+        }
       });
     });
   }
 
   initBrowserVisibilityChangeListener();
+
+  return self;
+};
+
+lg.sidebarBuild = function (build, index, bigBuildsCount) {
+  var self = {};
+
+  if (build.color === 'red') {
+    self.status = 'failure';
+  } else if (build.color === 'blue') {
+    self.status = 'success';
+  } else if (build.color.indexOf('anime') >= 0) {
+    self.status = 'building';
+  } else {
+    self.status = 'aborted';
+  }
+
+  var building = self.status === 'building';
+  var failed = self.status === 'failure';
+  var succeeded = self.status === 'success';
+  var aborted = self.status === 'aborted';
+
+  self.displayName = build.name.replace(/^acceptance_/i, '') + '#' + build.lastBuild.number;
+  self.code = self.displayName + self.status;
+  self.id = self.code + self.status;
+  self.index = index;
+
+  self.color = (function () {
+    if (building) return 'yellow';
+    if (failed) return 'red';
+    if (succeeded) return 'green';
+    return 'gray';
+  })();
+
+  var isBig = building || failed;
+
+  self.width = isBig ? lg.sidebarSizes.bigRectWidth : lg.sidebarSizes.smallRectWidth;
+  self.height = isBig ? lg.sidebarSizes.bigRectHeight : lg.sidebarSizes.smallRectHeight;
+  self.fontSize = isBig ? '14px' : '10px';
+  self.textColor = building || aborted ? 'black' : 'white';
+
+  self.xPosition = function (type) {
+    if (type === 'rect') {
+      return isBig ? lg.sidebarSizes.bigRectX : lg.sidebarSizes.smallRectX;
+    } else {
+      return isBig ? lg.sidebarSizes.bigTextX : lg.sidebarSizes.smallTextX;
+    }
+  };
+
+  self.rectY = (function () {
+    if (index < bigBuildsCount) {
+     return index * lg.sidebarSizes.bigRectHeight;
+    }
+    return lg.sidebarSizes.bigRectHeight * bigBuildsCount +
+      (index - bigBuildsCount) * lg.sidebarSizes.smallRectHeight;
+  })();
+
+  self.textY = (function () {
+    if (index < bigBuildsCount) {
+      return index * lg.sidebarSizes.bigRectHeight + 20;
+    }
+    return lg.sidebarSizes.bigRectHeight * bigBuildsCount +
+      (index - bigBuildsCount) * lg.sidebarSizes.smallRectHeight + 13;
+  })();
+
+  self.yPosition = function (type) {
+    return type === 'rect' ? self.rectY : self.textY;
+  };
 
   return self;
 };

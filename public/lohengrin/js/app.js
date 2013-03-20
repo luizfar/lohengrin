@@ -8,14 +8,15 @@ function init() {
       lg.debug(lg, 'Retrieved jobs from Jenkins...');
       lg.debug(lg, result);
       var renderer = lg.d3();
-      var sidebar = lg.sidebar();
       lg.onNewBuild(function (build) {
         renderer.redraw();
-        sidebar.addBuild(build);
         build.onUpdate(renderer.redraw);
       });
 
       result.root.start();
+
+      var sidebar = lg.sidebar();
+      sidebar.start();
     });
   });
 
