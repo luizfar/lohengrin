@@ -50,6 +50,12 @@ _.extend(lg, (function () {
       }
     }
 
+    var staleRoot = _.min(self.rootBuilds, function (b) { return b.number; });
+    staleRoot.stale = true;
+    var nonStaleRoots = _.reject(self.rootBuilds, areStale);
+    self.rootBuilds.length = 0;
+    _.each(nonStaleRoots, function (b) { self.rootBuilds.push(b); });
+
     var root = self.rootBuilds.shift();
     markToRemove(root);
     _.each(self.allBuilds, function (build) {
