@@ -6,7 +6,6 @@ module.exports = function (grunt) {
       all: [
         'public/lohengrin/js/**/*.js',
         'app.js',
-        'routes/**/*.js',
         'lib/**/*.js',
         'Gruntfile.js'
       ],

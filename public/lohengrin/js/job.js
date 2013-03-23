@@ -20,11 +20,11 @@ lg.job = function (name, baseUrlParam) {
   };
 
   self.hasChild = function (job) {
-    return _.find(self.children, function (c) { return c.name === job.name; }) != null;
+    return !!_(self.children).find(function (c) { return c.name === job.name; });
   };
 
   self.hasParent = function (job) {
-    return _.find(self.parents, function (p) { return p.name === job.name; }) != null;
+    return !!_(self.parents).find(function (p) { return p.name === job.name; });
   };
 
   self.isRoot = function () {
@@ -83,9 +83,9 @@ lg.job = function (name, baseUrlParam) {
   }
 
   function getAllJenkinsBuildsIn(jobJson) {
-    var builds = jobJson['builds'];
-    var latestListedBuildNumber = parseInt(builds[0]['number']);
-    var lastBuild = parseInt(jobJson['lastBuild']['number']);
+    var builds = jobJson.builds;
+    var latestListedBuildNumber = parseInt(builds[0].number, 10);
+    var lastBuild = parseInt(jobJson.lastBuild.number, 10);
 
     var result = _.map(builds, function (build) {
       return lg.build.fromJenkinsBuildData(self, build);
@@ -143,4 +143,8 @@ lg.job = function (name, baseUrlParam) {
   return self;
 };
 
-lg.job.URL_SUFFIX = '/api/json?tree=lastBuild[number],builds[number,building,result,actions[causes[userName,upstreamProject,upstreamBuild]],culprits[fullName]]';
+lg.job.URL_SUFFIX = [
+  '/api/json?tree=lastBuild[number],',
+  'builds[number,building,result,actions[causes[',
+  'userName,upstreamProject,upstreamBuild]],culprits[fullName]]'
+].join('');

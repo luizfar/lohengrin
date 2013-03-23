@@ -69,13 +69,13 @@ lg.sidebar = function () {
   function initNewTexts(textsEnter) {
     textsEnter.append('text')
       .attr('class', 'fresh enter')
-      .attr("font-family", "sans-serif")
-      .attr("x", lg.sidebarSizes.width)
+      .attr('font-family', 'sans-serif')
+      .attr('x', lg.sidebarSizes.width)
       .attr('y', -lg.sidebarSizes.bigRectHeight)
       .text(function (b) { return b.displayName; })
-      .attr("font-size", function (b) { return b.fontSize; })
+      .attr('font-size', function (b) { return b.fontSize; })
       .attr('title', function (b) { return b.displayName; })
-      .attr("fill", function (b) { return b.textColor; });
+      .attr('fill', function (b) { return b.textColor; });
   }
 
   function updateElements(type, builds) {
@@ -96,7 +96,7 @@ lg.sidebar = function () {
     svg.selectAll(freshSelector)
       .transition()
         .delay(200)
-        .attr('y', function (b) { return b.yPosition(type); })
+        .attr('y', function (b) { return b.yPosition(type); });
 
     var newRects = svg.selectAll(enterSelector);
 
@@ -174,38 +174,38 @@ lg.sidebar = function () {
 
   self.addBuild = function (build) {
     if (build.isDone()) {
-      addCompletedBuild(build);
+      //addCompletedBuild(build);
     } else {
-      addBuildInProgress(build);
+      //addBuildInProgress(build);
     }
   };
 
   function initBrowserVisibilityChangeListener() {
-    $(function() {
+    $(function () {
       var hidden, visibilityState, visibilityChange;
 
-      if (typeof document.hidden !== "undefined") {
-        hidden = "hidden";
-        visibilityChange = "visibilitychange";
-        visibilityState = "visibilityState";
+      if (typeof document.hidden !== 'undefined') {
+        hidden = 'hidden';
+        visibilityChange = 'visibilitychange';
+        visibilityState = 'visibilityState';
       }
-      else if (typeof document.mozHidden !== "undefined") {
-        hidden = "mozHidden";
-        visibilityChange = "mozvisibilitychange";
-        visibilityState = "mozVisibilityState";
+      else if (typeof document.mozHidden !== 'undefined') {
+        hidden = 'mozHidden';
+        visibilityChange = 'mozvisibilitychange';
+        visibilityState = 'mozVisibilityState';
       }
-      else if (typeof document.msHidden !== "undefined") {
-        hidden = "msHidden";
-        visibilityChange = "msvisibilitychange";
-        visibilityState = "msVisibilityState";
+      else if (typeof document.msHidden !== 'undefined') {
+        hidden = 'msHidden';
+        visibilityChange = 'msvisibilitychange';
+        visibilityState = 'msVisibilityState';
       }
-      else if (typeof document.webkitHidden !== "undefined") {
-        hidden = "webkitHidden";
-        visibilityChange = "webkitvisibilitychange";
-        visibilityState = "webkitVisibilityState";
+      else if (typeof document.webkitHidden !== 'undefined') {
+        hidden = 'webkitHidden';
+        visibilityChange = 'webkitvisibilitychange';
+        visibilityState = 'webkitVisibilityState';
       }
 
-      document.addEventListener(visibilityChange, function() {
+      document.addEventListener(visibilityChange, function () {
         if (document[visibilityState] == 'visible') {
           scheduleRedraw();
         }
@@ -245,9 +245,9 @@ lg.sidebarBuild = function (build, index, bigBuildsCount) {
   self.index = index;
 
   self.color = (function () {
-    if (building) return 'yellow';
-    if (failed) return 'red';
-    if (succeeded) return 'green';
+    if (building) { return 'yellow'; }
+    if (failed) { return 'red'; }
+    if (succeeded) { return 'green'; }
     return 'gray';
   })();
 
@@ -268,7 +268,7 @@ lg.sidebarBuild = function (build, index, bigBuildsCount) {
 
   self.rectY = (function () {
     if (index < bigBuildsCount) {
-     return index * lg.sidebarSizes.bigRectHeight;
+      return index * lg.sidebarSizes.bigRectHeight;
     }
     return lg.sidebarSizes.bigRectHeight * bigBuildsCount +
       (index - bigBuildsCount) * lg.sidebarSizes.smallRectHeight;
@@ -295,7 +295,7 @@ lg.semaphore = function (total, callback) {
   var inProgress = false;
 
   self.signal = function () {
-    count++;
+    count = count + 1;
     if (count === total) {
       count = 0;
       inProgress = false;
