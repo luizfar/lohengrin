@@ -1,11 +1,10 @@
 module.exports = function (grunt) {
-
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     connect: { server: { options: { port: 19999, base: './public/' } } },
     jshint: {
       all: [
-        'public/jenkins-crawler/js/**/*.js',
+        'public/lohengrin/js/**/*.js',
         'app.js',
         'routes/**/*.js',
         'lib/**/*.js',
@@ -29,12 +28,23 @@ module.exports = function (grunt) {
         ],
         dest: 'public/external/js/all.js'
       }
+    },
+    simplemocha: {
+      options: {
+        globals: [],
+        timeout: 5000,
+        ignoreLeaks: false,
+        reporter: 'nyan'
+      },
+      all: { src: 'test/server/**/*_test.js' }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-simple-mocha');
 
-  grunt.registerTask('default', ['concat', 'jshint']);
+  grunt.registerTask('default', ['concat', 'jshint', 'test']);
+  grunt.registerTask('test', ['simplemocha']);
 };
