@@ -1,16 +1,17 @@
-'use strict';
-
-var express = require('express'),
-    routes = require('./routes/all'),
-    http = require('http'),
-    path = require('path'),
-    config = require('./lib/config/all');
+var express = require('express');
+var routes = require('./routes/all');
+var http = require('http');
+var path = require('path');
+var config = require('./lib/config/all');
+/*jslint nomen: true*/
+var dirname = __dirname;
+/*jslint nomen: false*/
 
 var app = express();
 
 app.configure(function () {
   app.set('port', process.env.PORT || 3000);
-  app.set('views', __dirname + '/views');
+  app.set('views', dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(express.favicon());
   app.use(express.logger('dev'));
@@ -19,8 +20,8 @@ app.configure(function () {
   app.use(express.cookieParser('your secret here'));
   app.use(express.session());
   app.use(app.router);
-  app.use(require('less-middleware')({ src: __dirname + '/public' }));
-  app.use(express['static'](path.join(__dirname, 'public')));
+  app.use(require('less-middleware')({ src: dirname + '/public' }));
+  app.use(express['static'](path.join(dirname, 'public')));
 });
 
 app.configure('development', function () {

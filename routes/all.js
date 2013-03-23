@@ -1,5 +1,3 @@
-'use strict';
-
 var home = require('./home'),
     jenkins = require('./jenkins'),
     config = require('./config');

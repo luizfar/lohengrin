@@ -1,5 +1,3 @@
-'use strict';
-
 var jenkins = require('../lib/jenkins/driver');
 
 exports.proxy = function (req, res) {
