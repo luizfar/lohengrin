@@ -32,11 +32,11 @@ lg.build = function (job, number) {
   };
 
   self.hasChild = function (build) {
-    return _.find(self.children, function (c) { return c.code === build.code; }) != null;
+    return !!_(self.children).find(function (c) { return c.code === build.code; });
   };
 
   self.hasParent = function (build) {
-    return _.find(self.parents, function (p) { return p.code === build.code; }) != null;
+    return !!_(self.parents).find(function (p) { return p.code === build.code; });
   };
 
   self.isDone = function () {
@@ -85,8 +85,8 @@ lg.build = function (job, number) {
     }
 
     _.each(causes, function (cause, index) {
-      if (cause['upstreamBuild']) {
-        var code = lg.build.codeOf(cause['upstreamProject'], cause['upstreamBuild']);
+      if (cause.upstreamBuild) {
+        var code = lg.build.codeOf(cause.upstreamProject, cause.upstreamBuild);
         self.upstreamProjectCodes.push(code);
       }
     });
@@ -131,7 +131,7 @@ lg.build.codeOf = function (job, number) {
 };
 
 lg.build.fromJenkinsBuildData = function (job, buildJson) {
-  var build = lg.build(job, parseInt(buildJson['number']));
+  var build = lg.build(job, parseInt(buildJson.number, 10));
   build.parseJenkinsBuildJson(buildJson);
   return build;
 };
