@@ -2,7 +2,7 @@
 *.*~
 node_modules/
 .DS_[s|S]tore
-public/css/*.css
+public/lohengrin/stylesheets/css/*.css
 setup_env.sh
 .myenv.sh
 .env
