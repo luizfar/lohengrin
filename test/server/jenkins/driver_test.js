@@ -1,26 +1,33 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
-require('sinon-mocha').enhance(sinon);
 
-describe('jenkins driver', function () {
-  process.env['LOHENGRIN_JENKINS_HOSTNAME'] = 'hostname';
-  process.env['LOHENGRIN_JENKINS_ROOT'] = 'root';
-  process.env['LOHENGRIN_JENKINS_USERNAME'] = 'username';
-  process.env['LOHENGRIN_JENKINS_PASSWORD'] = 'password';
-  process.env['LOHENGRIN_JENKINS_JOB_FILTER'] = 'job_filter';
-  process.env['LOHENGRIN_JENKINS_LAST_JOB_NAME'] = 'last_job_name';
+suite('jenkins driver', function () {
+  var dummyEnv = {
+    'LOHENGRIN_JENKINS_HOSTNAME': 'hostname',
+    'LOHENGRIN_JENKINS_ROOT': 'root',
+    'LOHENGRIN_JENKINS_USERNAME': 'username',
+    'LOHENGRIN_JENKINS_PASSWORD': 'password',
+    'LOHENGRIN_JENKINS_JOB_FILTER': 'job_filter',
+    'LOHENGRIN_JENKINS_LAST_JOB_NAME': 'last_job_name'
+  };
 
-  var driver = require('../../../lib/lohengrin/jenkins/driver');
+  require('../../../lib/lohengrin/config/all').init(dummyEnv);
+
   var https = require('https');
   var httpsRequest, httpsResponse;
+  var driver = require('../../../lib/lohengrin/jenkins/driver');
 
-  beforeEach(function () {
+  setup(function () {
     httpsRequest = sinon.stub(https, 'request');
     httpsResponse = { on: sinon.spy(), end: sinon.spy() };
     httpsRequest.returns(httpsResponse);
   });
 
-  it('requests the right path', function () {
+  teardown(function () {
+    httpsRequest.restore();
+  });
+
+  test('requests the right path', function () {
     var path = '/path/inside/jenkins';
 
     driver.request(path);
@@ -32,7 +39,7 @@ describe('jenkins driver', function () {
     });
   });
 
-  it('adds an error callback', function () {
+  test('adds an error callback', function () {
     var callbacks = { error: sinon.spy() };
 
     driver.request('path', callbacks);

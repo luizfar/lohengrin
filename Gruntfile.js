@@ -29,13 +29,18 @@ module.exports = function (grunt) {
       }
     },
     simplemocha: {
-      options: {
-        globals: [],
-        timeout: 5000,
-        ignoreLeaks: false,
-        reporter: 'nyan'
-      },
-      all: { src: 'test/server/**/*_test.js' }
+      all: {
+        options: {
+          globals: [],
+          timeout: 5000,
+          ui: 'tdd',
+          ignoreLeaks: false,
+          reporter: 'list'
+        },
+        src: [
+          'test/server/**/*_test.js'
+        ]
+      }
     }
   });
 
