@@ -4,7 +4,7 @@ lg.build = function (job, number) {
   var self = {};
   var updateListeners = [];
 
-  self.number = parseInt(number);
+  self.number = parseInt(number, 10);
   self.status = 'unknown';
   self.culprits = '';
   self.job = job;
@@ -72,16 +72,16 @@ lg.build = function (job, number) {
   };
 
   self.parseJenkinsBuildJson = function (buildJson) {
-    self.status = buildJson['building'] ? 'building' : buildJson['result'].toLowerCase();
+    self.status = buildJson.building ? 'building' : buildJson.result.toLowerCase();
 
-    var causesAction = _.find(buildJson['actions'], function (action) { return action['causes']; });
-    var causes = causesAction['causes'];
+    var causesAction = _.find(buildJson.actions, function (action) { return action.causes; });
+    var causes = causesAction.causes;
 
-    if (causes[0]['userName']) {
-      self.culprits = causes[0]['userName'];
+    if (causes[0].userName) {
+      self.culprits = causes[0].userName;
     }
-    if (!self.culprits && buildJson['culprits'].length) {
-      self.culprits = _.pluck(buildJson['culprits'], 'fullName').join(', ');
+    if (!self.culprits && buildJson.culprits.length) {
+      self.culprits = _.pluck(buildJson.culprits, 'fullName').join(', ');
     }
 
     _.each(causes, function (cause, index) {
