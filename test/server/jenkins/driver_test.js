@@ -35,6 +35,14 @@ suite('jenkins driver', function () {
       });
     });
 
+    test('encoding', function () {
+      var callbacks = { partial: sinon.spy() };
+      var request = { setEncoding: sinon.spy(), on: sinon.spy() };
+      driver.request('', callbacks);
+      httpsRequest.lastCall.args[1](request);
+      expect(request.setEncoding.calledWith('utf8')).to.equal(true);
+    });
+
     suite('callbacks', function () {
       test('error', function () {
         var callbacks = { error: sinon.spy() };
@@ -47,12 +55,32 @@ suite('jenkins driver', function () {
 
       test('partial', function () {
         var callbacks = { partial: sinon.spy() };
+        var onData;
+        var request = { setEncoding: sinon.spy(), on: function (name, fn) {
+          onData = onData || (name === 'data') && fn;
+        }};
         driver.request('', callbacks);
+        httpsRequest.lastCall.args[1](request);
+
+        onData('chunk1');
+        expect(callbacks.partial.calledWith('chunk1')).to.equal(true);
       });
 
       test('success', function () {
         var callbacks = { success: sinon.spy() };
+        var onData, onEnd;
+        var request = { setEncoding: sinon.spy(), on: function (name, fn) {
+          onData = onData || (name === 'data') && fn;
+          onEnd = onEnd || (name === 'end') && fn;
+        }};
         driver.request('', callbacks);
+        httpsRequest.lastCall.args[1](request);
+
+        onData('chunk1');
+        onData('chunk2');
+        onEnd();
+
+        expect(callbacks.success.calledWith('chunk1chunk2')).to.equal(true);
       });
     });
   });
