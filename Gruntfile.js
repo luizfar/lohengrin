@@ -12,11 +12,27 @@ module.exports = function (grunt) {
         'Gruntfile.js'
       ],
       options: { jshintrc: '.jshintrc' }
+    },
+    concat: {
+      options: {
+        stripBanners: true,
+        banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */'
+      },
+      external: {
+        src: [
+          'public/external/js/src/lodash.js',
+          'public/external/js/src/jquery-v2.0.0-pre.js',
+          'public/external/js/src/d3.v3.js',
+          'public/external/js/src/require.js'
+        ],
+        dest: 'public/external/js/all.js'
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
-  grunt.registerTask('default', ['jshint']);
+  grunt.registerTask('default', ['concat', 'jshint']);
 };
