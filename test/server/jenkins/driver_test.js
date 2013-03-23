@@ -27,7 +27,7 @@ suite('jenkins driver', function () {
     httpsRequest.restore();
   });
 
-  test('requests the right path', function () {
+  test('request path', function () {
     var path = '/path/inside/jenkins';
 
     driver.request(path);
@@ -39,7 +39,7 @@ suite('jenkins driver', function () {
     });
   });
 
-  test('adds an error callback', function () {
+  test('error callback', function () {
     var callbacks = { error: sinon.spy() };
 
     driver.request('path', callbacks);
