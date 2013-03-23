@@ -7,6 +7,7 @@ module.exports = function (grunt) {
         'public/lohengrin/js/**/*.js',
         'app.js',
         'lib/**/*.js',
+        'test/**/*.js',
         'Gruntfile.js'
       ],
       options: { jshintrc: '.jshintrc' }

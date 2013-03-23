@@ -8,10 +8,10 @@ suite('config all', function () {
     'LOHENGRIN_JENKINS_USERNAME': 'username',
     'LOHENGRIN_JENKINS_PASSWORD': 'password',
     'LOHENGRIN_JENKINS_JOB_FILTER': 'job_filter',
-    'LOHENGRIN_JENKINS_LAST_JOB_NAME': 'last_job_name',
+    'LOHENGRIN_JENKINS_LAST_JOB_NAME': 'last_job_name'
   };
 
-  config = require('../../../lib/lohengrin/config/all');
+  var config = require('../../../lib/lohengrin/config/all');
 
   setup(function () { config.init(dummyEnv); });
 

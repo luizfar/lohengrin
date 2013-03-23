@@ -4,11 +4,8 @@ var sinon = require('sinon');
 suite('jenkins driver', function () {
   var dummyEnv = {
     'LOHENGRIN_JENKINS_HOSTNAME': 'hostname',
-    'LOHENGRIN_JENKINS_ROOT': 'root',
     'LOHENGRIN_JENKINS_USERNAME': 'username',
-    'LOHENGRIN_JENKINS_PASSWORD': 'password',
-    'LOHENGRIN_JENKINS_JOB_FILTER': 'job_filter',
-    'LOHENGRIN_JENKINS_LAST_JOB_NAME': 'last_job_name'
+    'LOHENGRIN_JENKINS_PASSWORD': 'password'
   };
 
   require('../../../lib/lohengrin/config/all').init(dummyEnv);
@@ -27,29 +24,36 @@ suite('jenkins driver', function () {
     httpsRequest.restore();
   });
 
-  test('request path', function () {
-    var path = '/path/inside/jenkins';
-
-    driver.request(path);
-
-    expect(httpsRequest.lastCall.args[0]).to.deep.equal({
-      hostname: 'hostname',
-      auth: 'username:password',
-      path: path
+  suite('request', function () {
+    test('path', function () {
+      var path = '/path/inside/jenkins';
+      driver.request(path);
+      expect(httpsRequest.lastCall.args[0]).to.deep.equal({
+        hostname: 'hostname',
+        auth: 'username:password',
+        path: path
+      });
     });
-  });
 
-  test('error callback', function () {
-    var callbacks = { error: sinon.spy() };
+    suite('callbacks', function () {
+      test('error', function () {
+        var callbacks = { error: sinon.spy() };
+        driver.request('', callbacks);
+        expect(httpsResponse.on.calledWith('error')).to.equal(true);
 
-    driver.request('path', callbacks);
+        httpsResponse.on.lastCall.args[1]('o noes!');
+        expect(callbacks.error.lastCall.args[0]).to.equal('o noes!');
+      });
 
-    expect(httpsResponse.on.lastCall.args[0]).to.equal('error');
+      test('partial', function () {
+        var callbacks = { partial: sinon.spy() };
+        driver.request('', callbacks);
+      });
 
-    expect(callbacks.error.called).not.to.equal(true);
-
-    httpsResponse.on.lastCall.args[1]('o noes!');
-
-    expect(callbacks.error.lastCall.args[0]).to.equal('o noes!');
+      test('success', function () {
+        var callbacks = { success: sinon.spy() };
+        driver.request('', callbacks);
+      });
+    });
   });
 });
