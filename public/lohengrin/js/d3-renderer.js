@@ -33,15 +33,15 @@ lg.d3 = function () {
     };
   }
 
-  var svg = d3.select("#graph").insert("svg", ":first-child")
-      .attr("width", width)
-      .attr("height", height);
+  var svg = d3.select('#graph').insert('svg', ':first-child')
+      .attr('width', width)
+      .attr('height', height);
 
   var force = d3.layout.force()
       .gravity(0.1)
       .charge(-240)
       .linkDistance(
-        function(link) {
+        function (link) {
           if (link.target.numberOfSiblings() > 6) {
             return 60;
           } else {
@@ -51,18 +51,18 @@ lg.d3 = function () {
       .size([width, height]);
 
   var forceNodes = force.nodes();
-  
   var forceLinks = force.links();
 
   var buildsCentroids = [
-    {x: 1 * width/4, y: 1 * height/4},
-    {x: 3 * width/4, y: 1 * height/4},
-    {x: 3 * width/4, y: 3 * height/4},
-    {x: 1 * width/4, y: 3 * height/4},
-    {x: 0 * width/4, y: 4 * height/4}];
+    {x: 1 * width / 4, y: 1 * height / 4},
+    {x: 3 * width / 4, y: 1 * height / 4},
+    {x: 3 * width / 4, y: 3 * height / 4},
+    {x: 1 * width / 4, y: 3 * height / 4},
+    {x: 0 * width / 4, y: 4 * height / 4}
+  ];
 
   function restart() {
-    var allLinks = svg.selectAll("line.link")
+    var allLinks = svg.selectAll('line.link')
         .data(forceLinks, function (d) { return d.source + '-' + d.target; });
 
     var linkEnter = allLinks
@@ -89,7 +89,7 @@ lg.d3 = function () {
         .attr('class', function (d) {
           return d.status + ' ' + (d.job.isLast ? 'last' : '');
         })
-        .style('fill', function(d) {
+        .style('fill', function (d) {
           if (d.status == 'success') {
             if (d.isRoot()) {
               return '#00cc00';
@@ -110,8 +110,8 @@ lg.d3 = function () {
 
     nodeEnter.append('text')
         .attr('class', 'nodetext')
-        .attr("dx", 12)
-        .attr("dy", ".35em")
+        .attr('dx', 12)
+        .attr('dy', '.35em')
         .text(function (d) {
           if (d.hasFailed()) {
             return d.displayName.replace(/^qe_selenium_/i, '');
@@ -132,43 +132,38 @@ lg.d3 = function () {
         return link.target.code === build;
       });
 
-      if (parentBuilds.length == 0) {
-        return build;
-      }
+      if (parentBuilds.length === 0) { return build; }
 
       return findHeadBuild(parentBuilds[0].source.code);
-    };
+    }
 
-    force.on("tick", function(e) {
+    force.on('tick', function (e) {
       linkEnter
-        .attr("x1", function(d) { return normalizePosition(d.source).x; })
-        .attr("y1", function(d) { return normalizePosition(d.source).y; })
-        .attr("x2", function(d) { return normalizePosition(d.target).x; })
-        .attr("y2", function(d) { return normalizePosition(d.target).y; });
+        .attr('x1', function (d) { return normalizePosition(d.source).x; })
+        .attr('y1', function (d) { return normalizePosition(d.source).y; })
+        .attr('x2', function (d) { return normalizePosition(d.target).x; })
+        .attr('y2', function (d) { return normalizePosition(d.target).y; });
 
-      nodeEnter.attr("transform", function(d) {
+      nodeEnter.attr('transform', function (d) {
         var position = normalizePosition(d);
-        return "translate(" + position.x + "," + position.y + ")";
+        return 'translate(' + position.x + ',' + position.y + ')';
       });
 
       var headNodes = forceNodes.filter(
-        function(node) {
+        function (node) {
           return node.isRoot();
         });
 
-      headNodes.sort(
-        function(a, b) {
-          if (a.code < b.code)
-            return 1;
-          if (a.code > b.code)
-            return -1;
-          return 0;
-        });
+      headNodes.sort(function (a, b) {
+        if (a.code < b.code) { return 1; }
+        if (a.code > b.code) { return -1; }
+        return 0;
+      });
 
       var k = e.alpha * 0.1;
       forceNodes.forEach(
-        function(node) {
-          node.rootBuildsCode.forEach(function(rootBuildCode) {
+        function (node) {
+          node.rootBuildsCode.forEach(function (rootBuildCode) {
             var rootBuild = forceNodes.filter(
               function (build) {
                 return build.code == rootBuildCode;
