@@ -124,11 +124,7 @@ lg.job = function (name, baseUrlParam) {
       }
     });
 
-    if (hasKnownParents) {
-      return true;
-    }
-
-    return false;
+    return hasKnownParents;
   }
 
   function add(build) {
