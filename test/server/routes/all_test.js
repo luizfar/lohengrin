@@ -1,7 +1,7 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 
-suite('config route', function () {
+suite('all routes', function () {
   var configRoute = require('../../../lib/lohengrin/routes/config');
   var jenkinsRoute = require('../../../lib/lohengrin/routes/jenkins');
   var homeRoute = require('../../../lib/lohengrin/routes/home');
