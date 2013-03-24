@@ -9,7 +9,8 @@ files = [
   MOCHA,
   'public/external/js/all.js',
   'public/lohengrin/js/**/*.js',
-  'test/support/**/*.js',
+  'test/support/*.js',
+  'test/support/plugins/*.js',
   'test/client/**/*_test.js'
 ];
 

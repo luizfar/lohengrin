@@ -18,7 +18,7 @@ lg.sidebarSizes = (function () {
   self.smallTextX = self.smallRectX + 6;
 
   return self;
-}) ();
+})();
 
 lg.sidebar = function () {
   var self = {};
@@ -308,9 +308,7 @@ lg.semaphore = function (total, callback) {
     inProgress = true;
   };
 
-  self.inProgress = function () {
-    return inProgress;
-  };
+  self.inProgress = function () { return inProgress; };
 
   return self;
 };
