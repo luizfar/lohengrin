@@ -1,12 +1,10 @@
 var expect = chai.expect;
 
-describe('jenkins json', function () {
-  beforeEach(function () { sinon.stub(jQuery, 'get'); });
-  afterEach(function () { jQuery.get.restore(); });
+suite('jenkins json', function () {
+  setup(function () { sinon.stub(jQuery, 'get'); });
+  teardown(function () { jQuery.get.restore(); });
 
-  it('gets from the proxy', function () {
-    var json = JSON.stringify({'first': 'test'});
-
+  test('gets from the proxy', function () {
     lg.jenkinsJson('api/json', sinon.spy());
 
     expect(jQuery.get.lastCall.args[0]).to.equal('/jenkins/proxy');

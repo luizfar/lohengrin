@@ -18,13 +18,8 @@
   "jquery": true,
   "undef": true,
   "globals": {
-    "describe": true,
-    "each": true,
     "chai": true,
     "sinon": true,
-    "beforeEach": true,
-    "afterEach": true,
-    "it": true,
     "lg": true,
     "suite": true,
     "test": true,

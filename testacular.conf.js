@@ -7,7 +7,6 @@ basePath = '';
 // list of files / patterns to load in the browser
 files = [
   MOCHA,
-  MOCHA_ADAPTER,
   'public/external/js/all.js',
   'public/lohengrin/js/**/*.js',
   'test/support/**/*.js',
