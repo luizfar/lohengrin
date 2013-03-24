@@ -4,7 +4,7 @@ lg.jenkinsJson = function (path, callback, tries) {
   tries = tries || 0;
   if (tries < 5) {
     var fixedPath = path.length && path[0] === '/' ? path : '/' + path;
-    $.get('/jenkins/proxy?path=' + fixedPath, function (response) {
+    $.get('/jenkins/proxy', { path: fixedPath }, function (response) {
       var json;
       try {
         json = JSON.parse(response);

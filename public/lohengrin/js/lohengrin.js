@@ -35,7 +35,6 @@ _.extend(lg, (function () {
     newBuildCallbacks.push(newBuildCallback);
   };
 
-
   function cleanup() {
     function areStale(build) {
       return build.stale;

@@ -7,14 +7,15 @@ module.exports = function (grunt) {
         'public/lohengrin/js/**/*.js',
         'app.js',
         'lib/**/*.js',
-        'test/**/*.js',
+        'test/client/**/*.js',
+        'test/server/**/*.js',
         'Gruntfile.js'
       ],
       options: { jshintrc: '.jshintrc' }
     },
     concat: {
       options: {
-        separator: ';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;',
+        separator: ';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n',
         stripBanners: false,
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */',
         footer: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */'
@@ -42,6 +43,30 @@ module.exports = function (grunt) {
           'test/server/**/*_test.js'
         ]
       }
+    },
+    testacular: {
+      local: {
+        options: {
+          configFile: 'testacular.conf.js',
+          browsers: [ 'Chrome' ],
+          reporters: [ 'dots' ],
+          runnerPort: 9101,
+          keepalive: true,
+          autoWatch: true,
+          singleRun: false
+        }
+      },
+      ci: {
+        options: {
+          configFile: 'testacular.conf.js',
+          browsers: [ 'Chrome', 'PhantomJS', 'Firefox' ],
+          reporters: [ 'dots' ],
+          runnerPort: 9102,
+          keepalive: true,
+          autoWatch: false,
+          singleRun: true
+        }
+      }
     }
   });
 
@@ -49,7 +74,8 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-simple-mocha');
+  grunt.loadNpmTasks('grunt-testacular');
 
   grunt.registerTask('default', ['concat', 'jshint', 'test']);
-  grunt.registerTask('test', ['simplemocha']);
+  grunt.registerTask('test', ['simplemocha', 'testacular:ci']);
 };

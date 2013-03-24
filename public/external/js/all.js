@@ -1,4 +1,4 @@
-/*! lohengrin - v0.0.1 - 2013-03-23 *//**
+/*! lohengrin - v0.0.1 - 2013-03-24 *//**
  * @license
  * Lo-Dash 1.0.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modern -o ./dist/lodash.js`
@@ -4981,7 +4981,8 @@
     window._ = lodash;
   }
 }(this));
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;/*!
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+/*!
  * jQuery JavaScript Library v2.0.0pre
  * http://jquery.com/
  *
@@ -13681,7 +13682,8 @@ if ( typeof module === "object" && typeof module.exports === "object" ) {
 }
 
 })( this );
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;(function() {
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(function() {
   var d3_format_decimalPoint = ".", d3_format_thousandsSeparator = ",", d3_format_grouping = [ 3, 3 ];
   if (!Date.now) Date.now = function() {
     return +new Date();
@@ -21491,7 +21493,8 @@ if ( typeof module === "object" && typeof module.exports === "object" ) {
   d3.time.scale.utc = function() {
     return d3_time_scale(d3.scale.linear(), d3_time_scaleUTCMethods, d3_time_scaleUTCFormat);
   };
-})();;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;/** vim: et:ts=4:sw=4:sts=4
+})();;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+/** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.1.2 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
  * see: http://github.com/jrburke/requirejs for details
@@ -23484,4 +23487,4 @@ var requirejs, require, define;
     //Set up with config info.
     req(cfg);
 }(this));
-/*! lohengrin - v0.0.1 - 2013-03-23 */
+/*! lohengrin - v0.0.1 - 2013-03-24 */

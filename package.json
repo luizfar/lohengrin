@@ -27,6 +27,8 @@
     "sinon-mocha": "0.0.3",
     "sinon": "~1.6.0",
     "chai": "~1.5.0",
-    "grunt-simple-mocha": "~0.3.2"
+    "grunt-simple-mocha": "~0.3.2",
+    "grunt-testacular": "~0.3.0",
+    "phantomjs": "~1.8.2-2"
   }
 }
