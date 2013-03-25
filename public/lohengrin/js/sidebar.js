@@ -256,7 +256,7 @@ lg.sidebarBuild = function (build, index, bigBuildsCount) {
   self.width = isBig ? lg.sidebarSizes.bigRectWidth : lg.sidebarSizes.smallRectWidth;
   self.height = isBig ? lg.sidebarSizes.bigRectHeight : lg.sidebarSizes.smallRectHeight;
   self.fontSize = isBig ? '14px' : '10px';
-  self.textColor = building || aborted ? 'black' : 'white';
+  self.textColor = (building || aborted) ? 'black' : 'white';
 
   self.xPosition = function (type) {
     if (type === 'rect') {

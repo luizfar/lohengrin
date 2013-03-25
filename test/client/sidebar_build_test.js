@@ -48,4 +48,67 @@ suite('sidebar build', function () {
     test('yellow', function () { expect(dummyBuild({ color: 'banana anime' }).color).to.equal('yellow'); });
     test('gray', function () { expect(dummyBuild({ color: 'banana' }).color).to.equal('gray'); });
   });
+
+  suite('height', function () {
+    test('building', function () {
+      expect(dummyBuild({ color: 'banana anime' }).height).to.equal(
+        lg.sidebarSizes.bigRectHeight
+      );
+    });
+    test('failed', function () {
+      expect(dummyBuild({ color: 'red' }).height).to.equal(
+        lg.sidebarSizes.bigRectHeight
+      );
+    });
+    test('banana', function () {
+      expect(dummyBuild({ color: 'banana' }).height).to.equal(
+        lg.sidebarSizes.smallRectHeight
+      );
+    });
+  });
+
+  suite('width', function () {
+    test('building', function () {
+      expect(dummyBuild({ color: 'banana anime' }).width).to.equal(
+        lg.sidebarSizes.bigRectWidth
+      );
+    });
+    test('failed', function () {
+      expect(dummyBuild({ color: 'red' }).width).to.equal(
+        lg.sidebarSizes.bigRectWidth
+      );
+    });
+    test('banana', function () {
+      expect(dummyBuild({ color: 'banana' }).width).to.equal(
+        lg.sidebarSizes.smallRectWidth
+      );
+    });
+  });
+
+  suite('font size', function () {
+    test('building', function () {
+      expect(dummyBuild({ color: 'banana anime' }).fontSize).to.equal('14px');
+    });
+    test('failed', function () {
+      expect(dummyBuild({ color: 'red' }).fontSize).to.equal('14px');
+    });
+    test('banana', function () {
+      expect(dummyBuild({ color: 'banana' }).fontSize).to.equal('10px');
+    });
+  });
+
+  suite('text color', function () {
+    test('building', function () {
+      expect(dummyBuild({ color: 'banana anime' }).textColor).to.equal('black');
+    });
+    test('passing', function () {
+      expect(dummyBuild({ color: 'blue' }).textColor).to.equal('white');
+    });
+    test('failed', function () {
+      expect(dummyBuild({ color: 'red' }).textColor).to.equal('white');
+    });
+    test('banana', function () {
+      expect(dummyBuild({ color: 'banana' }).textColor).to.equal('black');
+    });
+  });
 });
