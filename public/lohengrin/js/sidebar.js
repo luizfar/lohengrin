@@ -138,7 +138,7 @@ lg.sidebar = function () {
 
     if (transitionSemaphore.inProgress()) {
       updateScheduled = true;
-      setTimeout(scheduleUpdate, 500);
+      lg.every(500, scheduleUpdate);
     } else {
       update();
       updateScheduled = false;
@@ -149,12 +149,18 @@ lg.sidebar = function () {
     updateScheduled = false;
     if (transitionSemaphore.inProgress()) {
       redrawScheduled = true;
-      setTimeout(scheduleRedraw, 500);
+      lg.every(500, scheduleRedraw);
     } else {
       redraw();
       redrawScheduled = false;
     }
   }
+
+  self.listBuilds = function (type) {
+    return ((type === 'failed') && _(failedBuilds).clone()) ||
+      ((type === 'successful') && _(successfulBuilds).clone()) ||
+      ((type === 'inProgress') && _(buildsInProgress).clone());
+  };
 
   self.start = function () {
     lg.jenkinsJson('api/json?tree=jobs[name,url,color,lastBuild[number]]', function (json) {
@@ -168,7 +174,7 @@ lg.sidebar = function () {
         return job.color !== 'red' && job.color.indexOf('anime') == -1 && lg.jenkins.hasJob(job.name);
       });
       scheduleUpdate();
-      setTimeout(self.start, 30000);
+      lg.every(30000, self.start);
     });
   };
 

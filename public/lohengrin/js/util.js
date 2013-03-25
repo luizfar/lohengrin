@@ -18,3 +18,5 @@ lg.jenkinsJson = function (path, callback, tries) {
     console.error('Giving up request to ' + path + ' after many errors.');
   }
 };
+
+lg.every = function (interval, callback) { setTimeout(callback, interval); };
