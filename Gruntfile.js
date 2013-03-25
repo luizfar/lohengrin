@@ -65,6 +65,17 @@ module.exports = function (grunt) {
           autoWatch: false,
           singleRun: true
         }
+      },
+      travis: {
+        options: {
+          configFile: 'testacular.conf.js',
+          browsers: [ 'PhantomJS' ],
+          reporters: [ 'dots' ],
+          runnerPort: 9102,
+          keepalive: true,
+          autoWatch: false,
+          singleRun: true
+        }
       }
     }
   });
@@ -76,4 +87,5 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', ['concat', 'jshint', 'test']);
   grunt.registerTask('test', ['simplemocha', 'testacular:ci']);
+  grunt.registerTask('travis', ['concat', 'jshint', 'simplemocha', 'testacular:travis']);
 };
