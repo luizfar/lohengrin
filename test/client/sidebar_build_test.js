@@ -111,4 +111,93 @@ suite('sidebar build', function () {
       expect(dummyBuild({ color: 'banana' }).textColor).to.equal('black');
     });
   });
+
+  suite('rect x position', function () {
+    test('building', function () {
+      expect(dummyBuild({ color: 'banana anime' }).xPosition('rect')).to.equal(
+        lg.sidebarSizes.bigRectX
+      );
+    });
+    test('failed', function () {
+      expect(dummyBuild({ color: 'red' }).xPosition('rect')).to.equal(
+        lg.sidebarSizes.bigRectX
+      );
+    });
+    test('banana', function () {
+      expect(dummyBuild({ color: 'banana' }).xPosition('rect')).to.equal(
+        lg.sidebarSizes.smallRectX
+      );
+    });
+  });
+
+  suite('text x position', function () {
+    test('building', function () {
+      expect(dummyBuild({ color: 'banana anime' }).xPosition('text')).to.equal(
+        lg.sidebarSizes.bigTextX
+      );
+    });
+    test('failed', function () {
+      expect(dummyBuild({ color: 'red' }).xPosition('text')).to.equal(
+        lg.sidebarSizes.bigTextX
+      );
+    });
+    test('banana', function () {
+      expect(dummyBuild({ color: 'banana' }).xPosition('text')).to.equal(
+        lg.sidebarSizes.smallTextX
+      );
+    });
+  });
+
+  suite('rect y', function () {
+    test('index < big builds count', function () {
+      expect(dummyBuild({}, 2, 3).rectY).to.equal(
+        2 * lg.sidebarSizes.bigRectHeight
+      );
+    });
+
+    test('index > big builds count', function () {
+      expect(dummyBuild({}, 5, 2).rectY).to.equal(
+        (2 * lg.sidebarSizes.bigRectHeight) + (3 * lg.sidebarSizes.smallRectHeight)
+      );
+    });
+
+    test('index == big builds count', function () {
+      expect(dummyBuild({}, 4, 4).rectY).to.equal(
+        4 * lg.sidebarSizes.bigRectHeight
+      );
+    });
+  });
+
+  suite('text y', function () {
+    test('index < big builds count', function () {
+      expect(dummyBuild({}, 2, 3).textY).to.equal(
+        2 * lg.sidebarSizes.bigRectHeight + 20
+      );
+    });
+
+    test('index > big builds count', function () {
+      expect(dummyBuild({}, 5, 2).textY).to.equal(
+        (2 * lg.sidebarSizes.bigRectHeight) + (3 * lg.sidebarSizes.smallRectHeight) + 13
+      );
+    });
+
+    test('index == big builds count', function () {
+      expect(dummyBuild({}, 4, 4).textY).to.equal(
+        4 * lg.sidebarSizes.bigRectHeight + 13
+      );
+    });
+  });
+
+  suite('y position', function () {
+    test('rect', function () {
+      expect(
+        _(dummyBuild()).tap(function (b) { b.rectY = 'banana'; }).value().yPosition('rect')
+      ).to.equal('banana');
+    });
+    test('text', function () {
+      expect(
+        _(dummyBuild()).tap(function (b) { b.textY = 'banana'; }).value().yPosition('text')
+      ).to.equal('banana');
+    });
+  });
 });
