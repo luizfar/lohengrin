@@ -1,6 +1,10 @@
 lohengrin
 =========
 
+![](http://i.imgur.com/IxvApme.png)
+
+![](http://imgur.com/u98cIBz)
+
 ## local setup
 
 ```
