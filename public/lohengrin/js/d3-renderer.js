@@ -170,8 +170,10 @@ lg.d3 = function () {
               })[0];
             var screenPosition = headNodes.indexOf(rootBuild);
             var center = buildsCentroids[screenPosition];
-            node.x += (center.x - node.x) * k;
-            node.y += (center.y - node.y) * k;
+            if (center) { // workaround for bug of a root node leaving when 2 tree are merged
+              node.x += (center.x - node.x) * k;
+              node.y += (center.y - node.y) * k;
+            }
           });
         });
     });
