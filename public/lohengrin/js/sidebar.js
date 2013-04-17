@@ -245,7 +245,8 @@ lg.sidebarBuild = function (build, index, bigBuildsCount) {
   var succeeded = self.status === 'success';
   var aborted = self.status === 'aborted';
 
-  self.displayName = build.name.replace(/^acceptance_/i, '') + '#' + build.lastBuild.number;
+  var buildNumber = build.lastBuild ? build.lastBuild.number : '0';
+  self.displayName = build.name.replace(/^acceptance_/i, '') + '#' + buildNumber;
   self.code = self.displayName + self.status;
   self.id = self.code + self.status;
   self.index = index;
