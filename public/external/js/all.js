@@ -1,4 +1,4 @@
-/*! lohengrin - v0.0.1 - 2013-03-25 *//**
+/*! lohengrin - v0.0.1 - 2013-04-19 *//**
  * @license
  * Lo-Dash 1.0.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modern -o ./dist/lodash.js`
@@ -23487,4 +23487,4 @@ var requirejs, require, define;
     //Set up with config info.
     req(cfg);
 }(this));
-/*! lohengrin - v0.0.1 - 2013-03-25 */
+/*! lohengrin - v0.0.1 - 2013-04-19 */

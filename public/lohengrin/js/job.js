@@ -141,6 +141,6 @@ lg.job = function (name, baseUrlParam) {
 
 lg.job.URL_SUFFIX = [
   '/api/json?tree=lastBuild[number],',
-  'builds[number,building,result,actions[causes[',
+  'builds[number,building,result,timestamp,estimatedDuration,actions[causes[',
   'userName,upstreamProject,upstreamBuild]],culprits[fullName]]'
 ].join('');

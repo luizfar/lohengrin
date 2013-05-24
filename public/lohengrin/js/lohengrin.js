@@ -7,33 +7,70 @@ _.extend(lg, (function () {
   self.allBuilds = [];
   self.buildsByCode = {};
   self.rootBuilds = [];
+  self.trees = {};
+
+  self.reset = function () {
+    lg.allBuilds = [];
+    lg.buildsByCode = {};
+    lg.rootBuilds = [];
+    lg.trees = {};
+  };
 
   self.addBuild = function (build) {
-    if (self.buildsByCode[build.code]) {
+    if (lg.buildsByCode[build.code]) {
       return;
     }
 
-    self.buildsByCode[build.code] = build;
+    lg.buildsByCode[build.code] = build;
     lg.allBuilds.push(build);
+    if (build.isRoot()) {
+      var newTree = lg.tree(build);
+      lg.trees[build.code] = newTree;
+
+      lg.rootBuilds.push(build);
+      if (lg.rootBuilds.length > 4) {
+        cleanup();
+      }
+    } else {
+      var roots = findRootsOf(build);
+      if (roots.length > 1) {
+        mergeTrees(roots);
+      }
+      lg.trees[roots[0].code].addBuild(build);
+    }
     _.each(newBuildCallbacks, function (callback) {
       callback(build);
     });
 
-    if (build.isRoot()) {
-      self.rootBuilds.push(build);
-      if (self.rootBuilds.length > 4) {
-        cleanup();
-      }
-    }
   };
 
   self.hasBuild = function (buildCode) {
-    return !!self.buildsByCode[buildCode];
+    return !!lg.buildsByCode[buildCode];
   };
 
   self.onNewBuild = function (newBuildCallback) {
     newBuildCallbacks.push(newBuildCallback);
   };
+
+  function findRootsOf(build) {
+    return _.map(build.rootBuildsCode, function (rootBuildCode) {
+      return lg.buildsByCode[rootBuildCode];
+    });
+  }
+
+  function mergeTrees(roots) {
+    var trees = _.map(roots, function (root) { return lg.trees[root.code]; });
+    trees = _.sortBy(trees, function (tree) { return tree.createdDate; });
+    var firstTree = trees.shift();
+
+    _.reduce(trees, function (memo, tree) {
+      return memo.mergeWith(tree);
+    }, firstTree);
+
+    _.each(firstTree.roots, function (root) {
+      lg.trees[root.code] = firstTree;
+    });
+  }
 
   function cleanup() {
     function areStale(build) {
@@ -49,21 +86,21 @@ _.extend(lg, (function () {
       }
     }
 
-    var staleRoot = _.min(self.rootBuilds, function (b) { return b.number; });
+    var staleRoot = _.min(lg.rootBuilds, function (b) { return b.number; });
     staleRoot.stale = true;
-    var nonStaleRoots = _.reject(self.rootBuilds, areStale);
-    self.rootBuilds.length = 0;
-    _.each(nonStaleRoots, function (b) { self.rootBuilds.push(b); });
+    var nonStaleRoots = _.reject(lg.rootBuilds, areStale);
+    lg.rootBuilds.length = 0;
+    _.each(nonStaleRoots, function (b) { lg.rootBuilds.push(b); });
 
     markToRemove(staleRoot);
-    _.each(self.allBuilds, function (build) {
+    _.each(lg.allBuilds, function (build) {
       if (build.stale) {
-        delete self.buildsByCode[build.code];
+        delete lg.buildsByCode[build.code];
       }
     });
-    var nonStaleBuilds = _.reject(self.allBuilds, areStale);
+    var nonStaleBuilds = _.reject(lg.allBuilds, areStale);
     self.allBuilds.length = 0;
-    _.each(nonStaleBuilds, function (b) { self.allBuilds.push(b); });
+    _.each(nonStaleBuilds, function (b) { lg.allBuilds.push(b); });
   }
 
   return self;

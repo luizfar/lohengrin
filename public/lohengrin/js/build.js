@@ -14,6 +14,8 @@ lg.build = function (job, number) {
   self.started = false;
   self.parsed = false;
   self.upstreamProjectCodes = [];
+  self.duration = 0;
+  self.timestamp = 0;
   self.displayName = (function () {
     return self.code;
   })();
@@ -84,6 +86,9 @@ lg.build = function (job, number) {
       self.culprits = _.pluck(buildJson.culprits, 'fullName').join(', ');
     }
 
+    self.timestamp = buildJson.timestamp;
+    self.duration = buildJson.duration || 0;
+
     _.each(causes, function (cause, index) {
       if (cause.upstreamBuild) {
         var code = lg.build.codeOf(cause.upstreamProject, cause.upstreamBuild);
@@ -121,6 +126,15 @@ lg.build = function (job, number) {
     _.each(updateListeners, function (listener) {
       listener(self);
     });
+  };
+
+  self.tree = function () {
+    var firstRootCode = self.rootBuildsCode[0];
+    return lg.trees[firstRootCode];
+  };
+
+  self.endTime = function () {
+    return self.timestamp + self.duration;
   };
 
   return self;

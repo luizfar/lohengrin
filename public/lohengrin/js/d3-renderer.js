@@ -113,11 +113,12 @@ lg.d3 = function () {
         .attr('dx', 12)
         .attr('dy', '.35em')
         .text(function (d) {
+          var text;
           if (d.hasFailed()) {
             return d.displayName.replace(/^qe_selenium_/i, '');
           }
           if (d.isRoot()) {
-            return d.culprits;
+            return d.culprits + ' (' + d.tree().time() + ')';
           }
           return '';
         });
